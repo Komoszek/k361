@@ -152,9 +152,9 @@ router.post( '/track', function( req, res ) { // { id: STRING, title: STRING, al
     if ( Track.obj.rate !== Math.floor( Track.obj.rate ) ) {
 
         Track.obj.rate = Math.floor( Track.obj.rate ); }
-        
+
     for ( var i = 0; i < Catalog.obj.catalog.length; i++ ) {
-        
+
         if ( Catalog.obj.catalog[i].id === Track.obj.id ) {
 
             var Timestamp = Date.now();
@@ -166,15 +166,15 @@ router.post( '/track', function( req, res ) { // { id: STRING, title: STRING, al
             Catalog.obj.catalog[i].album = Track.obj.album;
             Catalog.obj.catalog[i].author = Track.obj.author;
             Catalog.obj.catalog[i].length = Track.obj.end - Track.obj.begin;
-            
+
             break; } }
-        
+
     db.swrite( 'LIB-TRACK-' + Track.obj.id, Track.obj, function ( ) {
 
         db.swrite( 'LIB-CATALOG', Catalog.obj );
 
         } );
-        
+
     res.sendStatus(200);
 
     } );
@@ -308,7 +308,26 @@ router.post( '/download', function( req, res ) { // { service: STRING, code: STR
 
                             } );
 
+
+                        //KOMOSZEK TEMP FIX
+
                         Catalog.obj.timestamp = Timestamp;
+
+                        var ViewsSum = 0, ViewsCount = 0;
+
+                        for ( var i = 0; i < Catalog.obj.tracks.length; i++ ) {
+
+                            var TempTrack = db.sread( 'LIB-TRACK-' + Catalog.obj.tracks[i] );
+
+                            if ( TempTrack.valid  && TempTrack.obj.state === 'READY' {
+
+                                ViewsSum += TempTrack.obj.views;
+                                ViewsCount++;
+                            }
+                        }
+
+                        if(ViewsCount)Track.views = ViewsSum/ViewsCount;
+
 
                         db.swrite( 'LIB-TRACK-' + Track.id, Track, function ( ) {
 
@@ -408,7 +427,7 @@ router.post( '/restore', function( req, res ) { // { id: STRING }
     if ( !Track.valid ) {
 
         res.status(400).send('Track has not been found.'); return; }
-        
+
     if ( Track.obj.state !== 'REMOVED' ) {
 
         res.status(400).send('Track has not been removed.'); return; }
