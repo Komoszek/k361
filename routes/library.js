@@ -311,7 +311,6 @@ router.post( '/download', function( req, res ) { // { service: STRING, code: STR
 
                         //KOMOSZEK TEMP FIX
 
-                        Catalog.obj.timestamp = Timestamp;
 
                         var ViewsSum = 0, ViewsCount = 0;
 
@@ -319,7 +318,7 @@ router.post( '/download', function( req, res ) { // { service: STRING, code: STR
 
                             var TempTrack = db.sread( 'LIB-TRACK-' + Catalog.obj.tracks[i] );
 
-                            if ( TempTrack.valid  && TempTrack.obj.state === 'READY' {
+                            if ( TempTrack.valid  && TempTrack.obj.state === 'READY') {
 
                                 ViewsSum += TempTrack.obj.views;
                                 ViewsCount++;
@@ -327,6 +326,8 @@ router.post( '/download', function( req, res ) { // { service: STRING, code: STR
                         }
 
                         if(ViewsCount)Track.views = ViewsSum/ViewsCount;
+
+                        Catalog.obj.timestamp = Timestamp;
 
 
                         db.swrite( 'LIB-TRACK-' + Track.id, Track, function ( ) {
