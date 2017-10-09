@@ -325,7 +325,7 @@ router.post( '/download', function( req, res ) { // { service: STRING, code: STR
                             }
                         }
 
-                        if(ViewsCount)Track.views = ViewsSum/ViewsCount;
+                        if(ViewsCount)Track.views = parseInt(ViewsSum/ViewsCount);
 
                         Catalog.obj.timestamp = Timestamp;
 
