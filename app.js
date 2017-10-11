@@ -20,6 +20,55 @@ var app = express();
 var config = require('./config.js');
 var db = require('./db.js'); db.init();
 
+var SerialPort = require('serialport');
+
+var port = new SerialPort('/dev/ttyUSB0', { autoOpen: false });
+
+var ErrorHandled = false;
+
+port.open(function (err) {
+  if (err) {
+    if(!ErrorHandled){
+      ErrorHandled = true;
+      return console.log('Error opening port: ', err.message);
+    }
+    return;
+  }
+
+
+});
+
+portState='+';
+
+
+// The open event is always emitted
+port.on('open', function() {
+  ErrorHandled = false;
+});
+
+port.on('data', function(data) {
+portState = data.toString()[0];
+
+
+});
+
+
+portCheck = setInterval((function(){
+  if(!port.isOpen){
+    port.open(function (err) {
+      if (err) {
+        if(!ErrorHandled){
+          ErrorHandled = true;
+          return console.log('Error opening port: ', err.message);
+        }
+        return;
+      }
+    });
+  }
+}),1000);
+
+
+
 app.locals.GetAudioAccessPermission = function ( db ) {
 
     var Settings = db.sread('STE-SETTINGS');
@@ -58,7 +107,10 @@ app.locals.AudioAccessWatchman = function ( app, db ) {
         return; }
 
     if ( Audio.obj.playing ) {
-
+      if(portState !== '+'){
+        portState = '+';
+        port.write('+');
+      }
         if ( app.locals.GetAudioAccessPermission( db ) ) {
 
             Audio.obj.stream.kill();
@@ -97,13 +149,13 @@ app.locals.PlaylistManager = function ( app, db, player ) {
         db.swrite( 'PLT-SCHEDULE', Schedule.obj ); }
 
     if ( Schedule.obj.schedule.length > 0 ) {
-
         var Now = Date.now();
         var Next = -1;
         var Current = -1;
 
         var l = 0;
         var r = Schedule.obj.schedule.length - 1;
+
 
         while ( l < r ) {
 
@@ -139,16 +191,19 @@ app.locals.PlaylistManager = function ( app, db, player ) {
                 if ( Schedule.obj.schedule[r].begin <= Now ) {
 
                     Next = r + 1;
-                    Current = r; } } }
+                    Current = r; } }
+                  }
 
         else {
-
             Next = 0;
 
             if ( Schedule.obj.schedule[0].begin <= Now ) {
-
                 Next = 1;
                 Current = 0; } }
+
+                if(Schedule.obj.schedule.length == Next  ||   Schedule.obj.schedule[Next].end <= Now || Schedule.obj.schedule[Next].end-Now >= 60000){
+                  port.write('-');
+              }
 
         if ( Current >= 0 ) {
 
@@ -171,8 +226,10 @@ app.locals.PlaylistManager = function ( app, db, player ) {
 
                         console.log( 'While playing track an error occurred: ' + err ); }
 
-                    } );
 
+                    } );
+                    portState = '+';
+                    port.write('+');
                 Audio.obj.playing = true;
                 Audio.obj.track = Track.obj.id;
                 Track.obj.views = Track.obj.views + 1;
@@ -207,7 +264,13 @@ app.locals.PlaylistManager = function ( app, db, player ) {
 
         else if ( Next >= 0 && Next < Schedule.obj.schedule.length ) {
 
-            app.locals.PlaylistManagerTimeout = setTimeout( function ( ) { app.locals.PlaylistManager( app, db, player ); }, Schedule.obj.schedule[Next].begin - Now ); } }
+            app.locals.PlaylistManagerTimeout = setTimeout( function ( ) { app.locals.PlaylistManager( app, db, player ); }, Schedule.obj.schedule[Next].begin - Now ); }
+        } else {
+          console.log('Schedule is empty. Turning off power for audio device');
+            portState = '-';
+            port.write('-');
+        }
+
 
     };
 
@@ -525,6 +588,7 @@ app.locals.PlaylistDesigner = function ( app, db, player ) {
         if ( !Audio.obj.playing ) {
 
             app.locals.PlaylistManager( app, db, player ); } }
+
 
     };
 
