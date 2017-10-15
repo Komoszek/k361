@@ -1163,6 +1163,14 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria' ] ).c
 
                             function ( a, b ) {
 
+                              if ( a.title < b.title ) {
+
+                                  return -1; }
+
+                              if ( a.title > b.title ) {
+
+                                  return 1; }
+
                                 if ( a.author < b.author ) {
 
                                     return -1; }
@@ -1179,13 +1187,7 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria' ] ).c
 
                                     return 1; }
 
-                                if ( a.title < b.title ) {
 
-                                    return -1; }
-
-                                if ( a.title > b.title ) {
-
-                                    return 1; }
 
                                 return 0; } );
 
