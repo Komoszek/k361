@@ -166,7 +166,7 @@
                                                 </md-input-container>
 
                                                 <md-select name="Reference" ng-model="PlaylistControls.Values.value" ng-show="PlaylistControls.Values.order==2||PlaylistControls.Values.order==3" placeholder="Odniesienie" flex> <!-- EN: Reference -->
-                                                    <md-option ng-value="entry.id" ng-repeat="entry in Schedule">{{entry.text}}</md-option>
+                                                    <md-option ng-value="entry.id" ng-repeat="entry in ScheduleReference">{{entry.text}}</md-option>
                                                 </md-select>
 
                                                 <md-input-container style="margin-top:17px;margin-bottom:0;" ng-show="PlaylistControls.Values.order<1||PlaylistControls.Values.order>3" flex>

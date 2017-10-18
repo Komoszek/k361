@@ -55,6 +55,7 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria' ] ).c
     $scope.Downloading = [];
     $scope.Playlist = [];
     $scope.Schedule = [];
+    $scope.ScheduleReference = [];
     $scope.Settings = {};
     $scope.Tracks = [];
 
@@ -256,8 +257,6 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria' ] ).c
             Begin = new Date( $scope.PlaylistControls.Values.year, $scope.PlaylistControls.Values.month, $scope.PlaylistControls.Values.day, 17, 0, 0 );
             End = new Date( $scope.PlaylistControls.Values.year, $scope.PlaylistControls.Values.month, $scope.PlaylistControls.Values.day, 24, 0, 0 ); }
 
-        /*
-
         // TODO: TEST ->
 
         var ScheduleLeft = 0;
@@ -296,20 +295,27 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria' ] ).c
 
                 continue; }
 
-            $scope.PlaylistControls.Schedule.push( $scope.Schedule[i] ); }
+            $scope.PlaylistControls.Schedule.push( $scope.Schedule[i] );
+            $scope.ScheduleReference.push($scope.Schedule[i]);
+}
 
          // TODO: -> TEST
 
-        */
-
+/*
+        console.log($scope.Schedule);
         for ( var i = 0; i < $scope.Schedule.length; i++ ) { // TODO: CHANGE WITH UPPER CODE
 
             if ( $scope.Schedule[i].end < Begin.getTime() || $scope.Schedule[i].begin > End.getTime() ) {
 
-                continue; }
+                continue;
+              }
 
-            $scope.PlaylistControls.Schedule.push( $scope.Schedule[i] ); }
+            $scope.PlaylistControls.Schedule.push( $scope.Schedule[i] );
+            $scope.ScheduleReference.push($scope.Schedule[i]);
 
+          }
+
+*/
         if ( $scope.PlaylistControls.Schedule.length == 0 ) {
 
             return; }
