@@ -188,7 +188,6 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria' ] ).c
         };
 
     $scope.InitPlaylistControls = function ( ) {
-
         var Time = new Date();
 
         $scope.PlaylistControls.Values.day = Time.getDate();
@@ -216,7 +215,6 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria' ] ).c
         };
 
     $scope.UpdatePlaylistControls = function ( ) {
-
         if ( !$scope.PlaylistControls.Initiated ) {
 
             return; }
@@ -234,6 +232,7 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria' ] ).c
 
         $scope.Playlist = [];
         $scope.PlaylistControls.Schedule = [];
+        $scope.ScheduleReference = [];
 
         if ( $scope.Schedule.length == 0 ) {
 
@@ -1122,7 +1121,6 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria' ] ).c
         };
 
     $scope.Synchronize = function ( ) {
-
         $http.post( '/state/synchronize', {
 
             catalog: $scope.Synchronization.catalog,
