@@ -43,6 +43,14 @@ curl -sL https://deb.nodesource.com/setup_6.x | bash -
 apt-get install -y nodejs
 ```
 
+#### Arch-based (Arch, Manjaro, Antergos)
+
+Type in terminal as root or with sudo:
+
+```
+pacman -S npm
+```
+
 ### FFmpeg
 
 #### Windows
@@ -67,6 +75,14 @@ Type in terminal:
 sudo apt-get install mplayer
 ```
 
+#### Arch-based (Arch, Manjaro, Antergos)
+
+Type in terminal as root or with sudo:
+
+```
+sudo pacman -S mplayer
+```
+
 ### k361
 
 #### Windows
@@ -88,7 +104,7 @@ If you want to access the server from different device, you should open there a 
 
 You may consider automatically launching a server on system startup. If you are intrested, [see this tutorial](https://www.howtogeek.com/228467/how-to-make-a-program-run-at-startup-on-any-computer/).
 
-#### MacOs, Ubuntu and Debian
+#### MacOs, Linux
 
 In terminal, go to desired location (using `cd` command) and type:
 
@@ -115,7 +131,7 @@ Now you can open a web browser and go to `localhost`, or if you changed the port
 If you want to access the server from different device, you should open there a web browser and go to `[network].[host]:[port]`.
 For example address `192.168.1.101:80` represents network `192.168.1.XXX`, host `101` and port `80`. You can simply check the proper network and host values by typing in terminal `ifconfig` and looking at the *inet* field.
 
-You may consider automatically launching a server on system startup. If you are intrested, [see this tutorial](https://www.howtogeek.com/228467/how-to-make-a-program-run-at-startup-on-any-computer/).
+You may consider automatically launching a server on system startup. If you are intrested, [see this tutorial](https://www.howtogeek.com/228467/how-to-make-a-program-run-at-startup-on-any-computer/) or (on linux) use [PM2](https://github.com/Unitech/pm2)
 
 ## Used software
 

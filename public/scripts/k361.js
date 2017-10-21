@@ -232,7 +232,6 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria' ] ).c
 
         $scope.Playlist = [];
         $scope.PlaylistControls.Schedule = [];
-        $scope.ScheduleReference = [];
 
         if ( $scope.Schedule.length == 0 ) {
 
@@ -256,65 +255,53 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria' ] ).c
             Begin = new Date( $scope.PlaylistControls.Values.year, $scope.PlaylistControls.Values.month, $scope.PlaylistControls.Values.day, 17, 0, 0 );
             End = new Date( $scope.PlaylistControls.Values.year, $scope.PlaylistControls.Values.month, $scope.PlaylistControls.Values.day, 24, 0, 0 ); }
 
-        // TODO: TEST ->
+//Binary
 
-        var ScheduleLeft = 0;
-        var ScheduleRight = $scope.Schedule.length - 1;
+        var m;
 
-        var a = ScheduleRight;
-        var b = ScheduleLeft;
+        var Left = 1;
+        var LeftContr = $scope.Schedule.length - 1;
 
-        while ( a > ScheduleLeft ) {
+        var Right = 0;
+        var RightContr = $scope.Schedule.length - 2;
 
-            var m = Math.floor( ( ScheduleLeft + a ) / 2 );
+        if ($scope.Schedule[0].end > Begin.getTime()) {
 
-            if ( $scope.Schedule[m].end < Begin.getTime() ) {
-
-                ScheduleLeft = m + 1; }
-
-            else {
-
-                a = m; } }
-
-        while ( b < ScheduleRight ) {
-
-            var m = Math.floor( ( b + ScheduleRight ) / 2 );
-
-            if ( $scope.Schedule[m].begin > End.getTime() ) {
-
-                ScheduleRight = m - 1; }
-
-            else {
-
-                b = m + 1; } }
-
-        for ( var i = ScheduleLeft; i <= ScheduleRight; i++ ) {
-
-            if ( $scope.Schedule[i].end < Begin.getTime() || $scope.Schedule[i].begin > End.getTime() ) {
-
-                continue; }
-
-            $scope.PlaylistControls.Schedule.push( $scope.Schedule[i] );
-            $scope.ScheduleReference.push($scope.Schedule[i]);
-}
-
-         // TODO: -> TEST
-
-/*
-        console.log($scope.Schedule);
-        for ( var i = 0; i < $scope.Schedule.length; i++ ) { // TODO: CHANGE WITH UPPER CODE
-
-            if ( $scope.Schedule[i].end < Begin.getTime() || $scope.Schedule[i].begin > End.getTime() ) {
-
-                continue;
-              }
-
-            $scope.PlaylistControls.Schedule.push( $scope.Schedule[i] );
-            $scope.ScheduleReference.push($scope.Schedule[i]);
-
+          Left = 0;
+        } else if (Left < LeftContr) {
+          m = Math.floor((Left + LeftContr) / 2);
+          while (!($scope.Schedule[m].end >= Begin.getTime() && $scope.Schedule[m - 1].end < Begin.getTime()) && Left <= LeftContr) {
+            if ($scope.Schedule[m].end < Begin.getTime())
+            Left = m + 1;
+            else
+            LeftContr = m - 1;
+            m = Math.floor((Left + LeftContr) / 2);
+            if (LeftContr === -1) break;
           }
+          Left = m;
+        }
 
-*/
+        if ($scope.Schedule[$scope.Schedule.length - 1].begin < End.getTime()) {
+
+          Right = $scope.Schedule.length - 1;
+        } else if (Right < RightContr) {
+          m = Math.floor((Right + RightContr) / 2);
+          while (!($scope.Schedule[m + 1].begin >= End.getTime() && $scope.Schedule[m].begin < End.getTime()) && Right <= RightContr) {
+            if ($scope.Schedule[m].begin < End.getTime())
+            Right = m + 1;
+            else {
+              RightContr = m - 1;
+              if (RightContr === -1) break;
+            }
+            m = Math.floor((Right + RightContr) / 2)
+          }
+          Right = m;
+        }
+
+        if (Left <= Right && Right >= 0 && Left >= 0 && ($scope.Schedule[Left].end > Begin.getTime() && $scope.Schedule[Right].begin < End.getTime())) {
+          $scope.PlaylistControls.Schedule = $scope.Schedule.slice(Left, Right + 1);
+        }
+
         if ( $scope.PlaylistControls.Schedule.length == 0 ) {
 
             return; }

@@ -221,19 +221,30 @@ router.post( '/add', function( req, res ) { // { track: STRING, begin: DATE, dir
                 res.status(409).send('The track is in conflict with other track.'); return; } } }
 
     Schedule.obj.timestamp = Date.now();
-    Schedule.obj.schedule.push(Entry); // TODO: CHANGE PUSH TO BINARY INSERTION AND REMOVE UNNECESSARY SORT FUNCTION
 
-    Schedule.obj.schedule.sort( function ( a, b ) {
+    //TESTING BINARY INSERTION
 
-        if ( a.begin < b.begin ) {
+    var x = 0;
+    var y = Schedule.obj.schedule.length-1;
 
-            return -1; }
+    var k;
+    if ( Schedule.obj.schedule[0].begin > Entry.begin ) {
+        k = 0;
+      } else if(Schedule.obj.schedule[y].begin < Entry.begin){
+        k = y + 1;
+      }
+    else {
+      k = Math.floor((x + y)/2);
+       while (!(Schedule.obj.schedule[k].begin >= Entry.begin && Schedule.obj.schedule[k-1].begin < Entry.begin)) {
+      if(Schedule.obj.schedule[k].begin < Entry.begin)
+      x = k + 1;
+      else
+      y = k-1;
+      k = Math.floor((x + y)/2);
+    }
+  }
 
-        if ( a.begin > b.begin ) {
-
-            return 1; }
-
-        return 0; } );
+    Schedule.obj.schedule.splice(k, 0, Entry);
 
     db.swrite( 'PLT-SCHEDULE', Schedule.obj );
 

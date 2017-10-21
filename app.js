@@ -335,25 +335,50 @@ app.locals.PlaylistDesigner = function ( app, db, player ) {
             var Midnight = new Date();
             Midnight.setHours( 0, 0, 0 );
 
-            var Left = Schedule.obj.schedule.length;
-            var Right = -1;
+            var Left = 1;
+            var LeftContr = Schedule.obj.schedule.length-1;
 
+            var Right = 0;
+            var RightContr = Schedule.obj.schedule.length-2;
+
+            var m;
             if ( Schedule.obj.schedule[0].end > Midnight.getTime() ) {
 
-                Left = 0; }
+              Left = 0; }
+              else if(Left < LeftContr){
+                m = Math.floor((Left+LeftContr)/2);
+                while (!(Schedule.obj.schedule[m].end >= Midnight.getTime() && Schedule.obj.schedule[m-1].end < Midnight.getTime()) && Left <= LeftContr) {
+                  if(Schedule.obj.schedule[m].end < Midnight.getTime())
+                  Left = m+1;
+                  else
+                  LeftContr = m-1;
+                  m = Math.floor((Left+LeftContr)/2);
+                  if(LeftContr === -1)break;
 
-            else while ( Schedule.obj.schedule[ Left - 1 ].end > Midnight.getTime() ) { // TODO: CHANGE LINEAR SEARCH TO BINARY SEARCH
+                }
+                Left = m;
+              }
 
-                Left--; }
+            if ( Schedule.obj.schedule[Schedule.obj.schedule.length - 1].begin < ( Midnight.getTime() + 86400000 ) ) {
+              Right = Schedule.obj.schedule.length - 1; }
+              else if(Right < RightContr){
+                m = Math.floor((Right+RightContr)/2);
+                while (!(Schedule.obj.schedule[m+1].begin >= ( Midnight.getTime() + 86400000 ) && Schedule.obj.schedule[m].begin < ( Midnight.getTime() + 86400000 ) ) && Right <= RightContr) {
+                  if(Schedule.obj.schedule[m].begin < ( Midnight.getTime() + 86400000 ))
+                  Right = m+1;
+                  else
+                  RightContr = m-1;
 
-            if ( Schedule.obj.schedule[0].begin < ( Midnight.getTime() + 86400 ) ) {
+                  m = Math.floor((Right+RightContr)/2);
+                  if(RightContr === -1)break;
+                }
+                Right = m;
+              }
 
-                Right = Schedule.obj.schedule.length - 1; }
-
-            else while ( Schedule.obj.schedule[ Right + 1 ].begin < ( Midnight.getTime() + 86400 ) ) { // TODO: CHANGE LINEAR SEARCH TO BINARY SEARCH
-
-                Right++; }
-
+            if(Left > Right || Right < 0 || Left < 0 || !(Schedule.obj.schedule[Left].end > Midnight.getTime() &&  Schedule.obj.schedule[Right].begin < ( Midnight.getTime() + 86400000 )) ){
+              Left = 0;
+              Right = -1;
+            }
             for ( var i = Left; i <= Right; i++ ) {
 
                 var Entry = {
@@ -364,6 +389,7 @@ app.locals.PlaylistDesigner = function ( app, db, player ) {
                     };
 
                 ScheduleSector.push( Entry ); } }
+                console.log(ScheduleSector);
 
         var Intervals = [];
 
