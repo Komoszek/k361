@@ -227,22 +227,26 @@ router.post( '/add', function( req, res ) { // { track: STRING, begin: DATE, dir
     var x = 0;
     var y = Schedule.obj.schedule.length-1;
 
-    var k;
-    if ( Schedule.obj.schedule[0].begin > Entry.begin ) {
-        k = 0;
-      } else if(Schedule.obj.schedule[y].begin < Entry.begin){
-        k = y + 1;
+    var k = 0;
+
+    if(Schedule.obj.schedule.length > 0){
+      if ( Schedule.obj.schedule[0].begin > Entry.begin ) {
+          k = 0;
+        } else if(Schedule.obj.schedule[y].begin < Entry.begin){
+          k = y + 1;
+        }
+      else {
+        k = Math.floor((x + y)/2);
+         while (!(Schedule.obj.schedule[k].begin >= Entry.begin && Schedule.obj.schedule[k-1].begin < Entry.begin)) {
+        if(Schedule.obj.schedule[k].begin < Entry.begin)
+        x = k + 1;
+        else
+        y = k-1;
+        k = Math.floor((x + y)/2);
       }
-    else {
-      k = Math.floor((x + y)/2);
-       while (!(Schedule.obj.schedule[k].begin >= Entry.begin && Schedule.obj.schedule[k-1].begin < Entry.begin)) {
-      if(Schedule.obj.schedule[k].begin < Entry.begin)
-      x = k + 1;
-      else
-      y = k-1;
-      k = Math.floor((x + y)/2);
     }
-  }
+    }
+
 
     Schedule.obj.schedule.splice(k, 0, Entry);
 
