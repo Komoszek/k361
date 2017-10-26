@@ -580,45 +580,55 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
 
         };
 
+
+//TODO Fix searching to show every track
     $scope.SearchInCatalog = function ( ) {
 
-        $scope.Tracks = [];
+      $scope.Tracks = [];
 
-        if ( $scope.SearchText.length >= 3 ) {
+      var SearchedText = $scope.SearchText.toLowerCase();
 
-            for ( var i = 0; i < $scope.Catalog.length && $scope.Tracks < 100; i++ ) { // TODO: SHOW SOMETHING AT i >= 100
+      if ( $scope.SearchText.length >= 3 ) {
 
-                if ( $scope.Catalog[i].title.toLowerCase().search( $scope.SearchText.toLowerCase() ) != -1 ||
-                     $scope.Catalog[i].album.toLowerCase().search( $scope.SearchText.toLowerCase() ) != -1 ||
-                     $scope.Catalog[i].author.toLowerCase().search( $scope.SearchText.toLowerCase() ) != -1 ) {
+        $scope.Tracks = $scope.Catalog.filter(function(item){
+        if((item.title.toLowerCase()).indexOf(SearchedText) > -1)
+          return true;
+        if((item.author.toLowerCase()).indexOf(SearchedText) > -1)
+          return true;
+        if((item.album.toLowerCase()).indexOf(SearchedText) > -1)
+          return true;
 
-                    $scope.Tracks.push( $scope.Catalog[i] ); } } }
 
-        else {
+        return false;
+        });
 
-            $scope.Tracks = $scope.Catalog; }
+      } else {
+        $scope.Tracks = $scope.Catalog; }
+      };
 
-        };
+    $scope.SearchInPlaylistCatalog = function ( ) {
 
-        $scope.SearchInPlaylistCatalog = function ( ) {
+      $scope.TracksInPlaylist = [];
 
-            $scope.TracksInPlaylist = [];
+      var SearchedText = $scope.SearchTextPlaylist.toLowerCase();
 
-            if ( $scope.SearchText.length >= 3 ) {
+      if ( $scope.SearchTextPlaylist.length >= 3 ) {
 
-                for ( var i = 0; i < $scope.Catalog.length && $scope.TracksInPlaylist < 100; i++ ) { // TODO: SHOW SOMETHING AT i >= 100
+        $scope.TracksInPlaylist = $scope.Catalog.filter(function(item){
+        if((item.title.toLowerCase()).indexOf(SearchedText) > -1)
+          return true;
+        if((item.author.toLowerCase()).indexOf(SearchedText) > -1)
+          return true;
+        if((item.album.toLowerCase()).indexOf(SearchedText) > -1)
+          return true;
 
-                    if ( $scope.Catalog[i].title.toLowerCase().search( $scope.SearchText.toLowerCase() ) != -1 ||
-                         $scope.Catalog[i].album.toLowerCase().search( $scope.SearchText.toLowerCase() ) != -1 ||
-                         $scope.Catalog[i].author.toLowerCase().search( $scope.SearchText.toLowerCase() ) != -1 ) {
+        return false;
+        });
 
-                        $scope.TracksInPlaylist.push( $scope.Catalog[i] ); } } }
+      } else {
+        $scope.TracksInPlaylist = $scope.Catalog; }
+      };
 
-            else {
-
-                $scope.TracksInPlaylist = $scope.Catalog; }
-
-            };
 
     $scope.CreateTrack = function ( event ) {
 

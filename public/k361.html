@@ -148,7 +148,7 @@
 
                                                 <span flex="5"></span>
                                                 <md-select style="text-align:center;" name="Track" ng-model="PlaylistControls.Values.track" placeholder="Ścieżka" flex> <!-- EN: Track -->
-                                                           <md-input-container class="playlist-search" > <input type="text" ng-model="SearchText" ng-change="SearchInPlaylistCatalog()" ng-keydown="$event.stopPropagation()"/>
+                                                           <md-input-container class="playlist-search" > <input type="text" ng-model="SearchTextPlaylist" ng-change="SearchInPlaylistCatalog()" ng-keydown="$event.stopPropagation()"/>
                                                          </md-input-container>
                                                     <md-option ng-value="track.id" ng-repeat="track in TracksInPlaylist">{{ ( track.title.length > 23 ) && ( track.title.substr( 0, 20 ) + '...' ) || track.title }} - {{ ( track.author.length > 23 ) && ( track.author.substr( 0, 20 ) + '...' ) || track.author }}</md-option>
                                                 </md-select>

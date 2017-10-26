@@ -82,10 +82,6 @@ router.post( '/track', function( req, res ) { // { id: STRING, title: STRING, al
 
     var Track = db.sread( 'LIB-TRACK-' + req.body.id );
 
-    console.log("chujchujchuj");
-
-console.log(req.body);
-
     if ( !Track.valid ) {
 
         res.status(400).send('Track has not been found.'); return; }
@@ -167,7 +163,6 @@ console.log(req.body);
 
             var Timestamp = Date.now();
 
-            console.log(Track.obj);
             Catalog.obj.timestamp = Timestamp;
             Catalog.obj.catalog[i].timestamp = Timestamp;
 
