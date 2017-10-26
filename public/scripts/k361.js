@@ -1,6 +1,6 @@
 // TODO: TRANSLATE
 
-angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria' ] ).controller( 'Controller', [ '$scope', '$http', '$window', '$interval', '$mdSidenav', '$mdDialog', '$mdToast', '$mdMedia', function ( $scope, $http, $window, $interval, $mdSidenav, $mdDialog, $mdToast, $mdMedia ) {
+angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngTagsInput' ] ).controller( 'Controller', [ '$scope', '$http', '$window', '$interval', '$mdSidenav', '$mdDialog', '$mdToast', '$mdMedia', function ( $scope, $http, $window, $interval, $mdSidenav, $mdDialog, $mdToast, $mdMedia ) {
 
     $scope.$mdMedia = $mdMedia;
 
@@ -58,6 +58,7 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria' ] ).c
     $scope.ScheduleReference = [];
     $scope.Settings = {};
     $scope.Tracks = [];
+    $scope.TracksInPlaylist = [];
 
     $scope.MonthName = [
 
@@ -316,6 +317,8 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria' ] ).c
                 title: $scope.PlaylistControls.Schedule[i].title,
                 album: $scope.PlaylistControls.Schedule[i].album,
                 author: $scope.PlaylistControls.Schedule[i].author,
+                tags: $scope.PlaylistControls.Schedule[i].tags,
+
 
                 begin: $scope.PlaylistControls.Schedule[i].begin,
                 end: $scope.PlaylistControls.Schedule[i].end,
@@ -597,6 +600,26 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria' ] ).c
 
         };
 
+        $scope.SearchInPlaylistCatalog = function ( ) {
+
+            $scope.TracksInPlaylist = [];
+
+            if ( $scope.SearchText.length >= 3 ) {
+
+                for ( var i = 0; i < $scope.Catalog.length && $scope.TracksInPlaylist < 100; i++ ) { // TODO: SHOW SOMETHING AT i >= 100
+
+                    if ( $scope.Catalog[i].title.toLowerCase().search( $scope.SearchText.toLowerCase() ) != -1 ||
+                         $scope.Catalog[i].album.toLowerCase().search( $scope.SearchText.toLowerCase() ) != -1 ||
+                         $scope.Catalog[i].author.toLowerCase().search( $scope.SearchText.toLowerCase() ) != -1 ) {
+
+                        $scope.TracksInPlaylist.push( $scope.Catalog[i] ); } } }
+
+            else {
+
+                $scope.TracksInPlaylist = $scope.Catalog; }
+
+            };
+
     $scope.CreateTrack = function ( event ) {
 
         $mdDialog.show( {
@@ -722,6 +745,7 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria' ] ).c
                         title: response.title,
                         album: response.album,
                         author: response.author,
+                        tags: response.tags,
 
                         begin: response.begin,
                         end: response.end,
@@ -1194,6 +1218,8 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria' ] ).c
                             var Title = '';
                             var Album = '';
                             var Author = '';
+                            var Tags = [];
+
 
                             for ( var j = 0; j < $scope.Catalog.length; j++ ) {
 
@@ -1202,12 +1228,15 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria' ] ).c
                                     Title = $scope.Catalog[j].title;
                                     Album = $scope.Catalog[j].album;
                                     Author = $scope.Catalog[j].author;
+                                    Tags = $scope.Catalog[j].tags;
 
                                     break; } }
 
                             $scope.Schedule[i].title = Title;
                             $scope.Schedule[i].album = Album;
                             $scope.Schedule[i].author = Author;
+                            $scope.Schedule[i].tags = Tags;
+
 
                             if ( Title.length > 23 ) {
 
@@ -1334,6 +1363,8 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria' ] ).c
 
                 $scope.Catalog = response.data.catalog;
                 $scope.Tracks = $scope.Catalog;
+                $scope.TracksInPlaylist = $scope.Catalog;
+
                 $scope.Synchronization.catalog = response.data.timestamp;
 
                 LibraryReady = true;
@@ -1385,6 +1416,8 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria' ] ).c
                         var Title = '';
                         var Album = '';
                         var Author = '';
+                        var Tags = [];
+
 
                         for ( var j = 0; j < $scope.Catalog.length; j++ ) {
 
@@ -1393,12 +1426,14 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria' ] ).c
                                 Title = $scope.Catalog[j].title;
                                 Album = $scope.Catalog[j].album;
                                 Author = $scope.Catalog[j].author;
+                                Tags = $scope.Catalog[j].tags;
 
                                 break; } }
 
                         $scope.Schedule[i].title = Title;
                         $scope.Schedule[i].album = Album;
                         $scope.Schedule[i].author = Author;
+                        $scope.Schedule[i].tags = Tags;
 
                         if ( Title.length > 23 ) {
 
@@ -1447,6 +1482,8 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria' ] ).c
                         var Title = '';
                         var Album = '';
                         var Author = '';
+                        var Tags = [];
+
 
                         for ( var j = 0; j < $scope.Catalog.length; j++ ) {
 
@@ -1455,12 +1492,14 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria' ] ).c
                                 Title = $scope.Catalog[j].title;
                                 Album = $scope.Catalog[j].album;
                                 Author = $scope.Catalog[j].author;
+                                Tags = $scope.Catalog[j].tags;
 
                                 break; } }
 
                         $scope.Schedule[i].title = Title;
                         $scope.Schedule[i].album = Album;
                         $scope.Schedule[i].author = Author;
+                        $scope.Schedule[i].tags = Tags;
 
                         if ( Title.length > 23 ) {
 
@@ -1641,6 +1680,7 @@ function EditTrackController ( $scope, $http, $mdDialog, track ) {
         title: '',
         album: '',
         author: '',
+        tags: [],
 
         length: 36000,
         begin: 0,
@@ -1687,6 +1727,7 @@ function EditTrackController ( $scope, $http, $mdDialog, track ) {
                 $scope.Track.title = response.data.title;
                 $scope.Track.album = response.data.album;
                 $scope.Track.author = response.data.author;
+                $scope.Track.tags = response.data.tags;
                 $scope.Track.length = response.data.length;
                 $scope.Track.begin = response.data.begin;
                 $scope.Track.end = response.data.end;
@@ -1694,7 +1735,7 @@ function EditTrackController ( $scope, $http, $mdDialog, track ) {
                 $scope.Track.rate = response.data.rate;
 
                 $scope.TrackReady = true;
-
+                console.log($scope.Track);
                 },
 
             function ( response ) {

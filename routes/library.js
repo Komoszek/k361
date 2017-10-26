@@ -82,6 +82,10 @@ router.post( '/track', function( req, res ) { // { id: STRING, title: STRING, al
 
     var Track = db.sread( 'LIB-TRACK-' + req.body.id );
 
+    console.log("chujchujchuj");
+
+console.log(req.body);
+
     if ( !Track.valid ) {
 
         res.status(400).send('Track has not been found.'); return; }
@@ -105,6 +109,10 @@ router.post( '/track', function( req, res ) { // { id: STRING, title: STRING, al
     if ( typeof( req.body.album ) == 'string' ) {
 
         Track.obj.album = req.body.album.substr( 0, 256 ); }
+
+    if ( typeof( req.body.tags ) == 'object' ) {
+
+        Track.obj.tags = req.body.tags; }
 
     if ( typeof( req.body.author ) == 'string' ) {
 
@@ -159,6 +167,7 @@ router.post( '/track', function( req, res ) { // { id: STRING, title: STRING, al
 
             var Timestamp = Date.now();
 
+            console.log(Track.obj);
             Catalog.obj.timestamp = Timestamp;
             Catalog.obj.catalog[i].timestamp = Timestamp;
 
@@ -166,6 +175,7 @@ router.post( '/track', function( req, res ) { // { id: STRING, title: STRING, al
             Catalog.obj.catalog[i].album = Track.obj.album;
             Catalog.obj.catalog[i].author = Track.obj.author;
             Catalog.obj.catalog[i].length = Track.obj.end - Track.obj.begin;
+            Catalog.obj.catalog[i].tags = Track.obj.tags;
 
             break; } }
 
@@ -210,6 +220,8 @@ router.post( '/download', function( req, res ) { // { service: STRING, code: STR
             title: '',
             album: '',
             author: '',
+            tags: [],
+
 
             length: 0,
             begin: 0,
@@ -261,6 +273,7 @@ router.post( '/download', function( req, res ) { // { service: STRING, code: STR
                         Track.title = Track.id;
                         Track.album = 'Youtube';
                         Track.author = 'Unknown';
+                        Track.tags = [];
                         Track.length = 300;
                         Track.end = Track.length;
 
@@ -272,6 +285,7 @@ router.post( '/download', function( req, res ) { // { service: STRING, code: STR
                             title: Track.title,
                             album: Track.album,
                             author: Track.author,
+                            tags: Track.tags,
                             length: Track.length
 
                             } );
@@ -293,6 +307,7 @@ router.post( '/download', function( req, res ) { // { service: STRING, code: STR
                         Track.title = videoInfo.title;
                         Track.album = 'Youtube';
                         Track.author = videoInfo.owner;
+                        Track.tags = [];
                         Track.length = videoInfo.duration;
                         Track.end = Track.length;
 
@@ -304,6 +319,7 @@ router.post( '/download', function( req, res ) { // { service: STRING, code: STR
                             title: Track.title,
                             album: Track.album,
                             author: Track.author,
+                            tags: Track.tags,
                             length: Track.length
 
                             } );
@@ -449,6 +465,7 @@ router.post( '/restore', function( req, res ) { // { id: STRING }
                 title: Track.title,
                 album: Track.album,
                 author: Track.author,
+                tags: Track.tags,
                 length: Track.end - Track.begin
 
                 } );
