@@ -588,19 +588,35 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
 
       var SearchedText = $scope.SearchText.toLowerCase();
 
-      if ( $scope.SearchText.length >= 3 ) {
+      if ( SearchedText.length >= 3 ) {
 
-        $scope.Tracks = $scope.Catalog.filter(function(item){
-        if((item.title.toLowerCase()).indexOf(SearchedText) > -1)
-          return true;
-        if((item.author.toLowerCase()).indexOf(SearchedText) > -1)
-          return true;
-        if((item.album.toLowerCase()).indexOf(SearchedText) > -1)
-          return true;
+        SearchedText = SearchedText.split(':');
+        SearchedText[0] = SearchedText[0].trim();
 
+        if(SearchedText.length > 1 && SearchedText[0].toLowerCase() === 'tags'){
+          SearchedText[1] = SearchedText[1].trim().replace(/\s+/g,'-');
+          $scope.Tracks = $scope.Catalog.filter(function(item){
+            if(!item.tags.length || !SearchedText[1].length)return false;
 
-        return false;
-        });
+          for(tags in item.tags){
+            if((item.tags[tags].text.toLowerCase()).indexOf(SearchedText[1]) > -1)
+              return true;
+          }
+
+          return false;
+          });
+        } else {
+          $scope.Tracks = $scope.Catalog.filter(function(item){
+          if((item.title.toLowerCase()).indexOf(SearchedText[0]) > -1)
+            return true;
+          if((item.author.toLowerCase()).indexOf(SearchedText[0]) > -1)
+            return true;
+          if((item.album.toLowerCase()).indexOf(SearchedText[0]) > -1)
+            return true;
+
+          return false;
+          });
+        }
 
       } else {
         $scope.Tracks = $scope.Catalog; }
@@ -612,23 +628,39 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
 
       var SearchedText = $scope.SearchTextPlaylist.toLowerCase();
 
-      if ( $scope.SearchTextPlaylist.length >= 3 ) {
+      if ( SearchedText.length >= 3 ) {
 
-        $scope.TracksInPlaylist = $scope.Catalog.filter(function(item){
-        if((item.title.toLowerCase()).indexOf(SearchedText) > -1)
-          return true;
-        if((item.author.toLowerCase()).indexOf(SearchedText) > -1)
-          return true;
-        if((item.album.toLowerCase()).indexOf(SearchedText) > -1)
-          return true;
+        SearchedText = SearchedText.split(':');
+        SearchedText[0] = SearchedText[0].trim();
 
-        return false;
-        });
+        if(SearchedText.length > 1 && SearchedText[0].toLowerCase() === 'tags'){
+          SearchedText[1] = SearchedText[1].trim().replace(/\s+/g,'-');
+          $scope.TracksInPlaylist = $scope.Catalog.filter(function(item){
+            if(!item.tags.length || !SearchedText[1].length)return false;
+
+          for(tags in item.tags){
+            if((item.tags[tags].text.toLowerCase()).indexOf(SearchedText[1]) > -1)
+              return true;
+          }
+
+          return false;
+          });
+        } else {
+          $scope.TracksInPlaylist = $scope.Catalog.filter(function(item){
+          if((item.title.toLowerCase()).indexOf(SearchedText[0]) > -1)
+            return true;
+          if((item.author.toLowerCase()).indexOf(SearchedText[0]) > -1)
+            return true;
+          if((item.album.toLowerCase()).indexOf(SearchedText[0]) > -1)
+            return true;
+
+          return false;
+          });
+        }
 
       } else {
         $scope.TracksInPlaylist = $scope.Catalog; }
       };
-
 
     $scope.CreateTrack = function ( event ) {
 

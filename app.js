@@ -389,7 +389,6 @@ app.locals.PlaylistDesigner = function ( app, db, player ) {
                     };
 
                 ScheduleSector.push( Entry ); } }
-                console.log(ScheduleSector);
 
         var Intervals = [];
 
@@ -618,7 +617,91 @@ app.locals.PlaylistDesigner = function ( app, db, player ) {
 
     };
 
+    app.locals.TagsNewRemover = function ( app, db ) {
+      var NowRemover = new Date();
+
+      var Catalog = db.sread('LIB-CATALOG');
+      var index;
+
+      for(var k = Catalog.obj.catalog.length-1;k>=0;k--){
+
+        if((Catalog.obj.catalog[k].timestamp + 86400000) > NowRemover.getTime()){
+          var TrackId = Catalog.obj.catalog[k].id;
+          var Timestamp = Catalog.obj.catalog[k].timestamp;
+
+          setTimeout((function(k,TrackId,Timestamp){
+            var Catalog = db.sread('LIB-CATALOG');
+            if(Catalog.obj.catalog.length > 0){
+
+            var index;
+
+            if(k < Catalog.obj.catalog.length && Catalog.obj.catalog[k].id === TrackId){
+              index = Catalog.obj.catalog[k].tags.findIndex(x => x.text=="new");
+              if(index > -1)
+                Catalog.obj.catalog[k].tags.splice(index, 1);
+
+            } else {
+              var indexa = 0;
+              var indexb = Catalog.obj.catalog.length-1;
+              var indexm = Math.floor((indexa + indexb)/2);
+
+
+              while( indexa < indexb && Catalog.obj.catalog[indexm].timestamp !== Timestamp){
+                if(Catalog.obj.catalog[indexm].timestamp < Timestamp)
+                  indexa = indexm + 1;
+                else
+                  indexb = indexm - 1;
+
+                indexm = Math.floor((indexa + indexb)/2);
+              }
+              indexm = Math.floor((indexa + indexb)/2);
+                if(Catalog.obj.catalog[indexm].timestamp !== Timestamp)
+                return;
+
+                index = Catalog.obj.catalog[indexm].tags.findIndex(x => x.text=="new");
+                if(index > -1)
+                  Catalog.obj.catalog[indexm].tags.splice(index, 1);
+            }
+
+            var TimeoutTrack = db.sread( 'LIB-TRACK-' + TrackId );
+
+            index = TimeoutTrack.obj.tags.findIndex(x => x.text=="new");
+            if(index > -1)
+              TimeoutTrack.obj.tags.splice(index, 1);
+
+              db.swrite( 'LIB-TRACK-' + TrackId, TimeoutTrack.obj, function ( ) {
+
+                  db.swrite( 'LIB-CATALOG', Catalog.obj );
+
+                  } );
+            }
+          }),(86400000 - (NowRemover.getTime() - Catalog.obj.catalog[k].timestamp)),k,TrackId,Timestamp);
+        } else if(Catalog.obj.catalog[k].timestamp < NowRemover.getTime() && Catalog.obj.catalog[k].tags.findIndex(x => x.text=="new") > -1){
+          index = Catalog.obj.catalog[k].tags.findIndex(x => x.text=="new");
+          if(index > -1)
+            Catalog.obj.catalog[k].tags.splice(index, 1);
+
+          var TimeoutTrack = db.sread( 'LIB-TRACK-' + Catalog.obj.catalog[k].id );
+
+          index = TimeoutTrack.obj.tags.findIndex(x => x.text=="new");
+          if(index > -1)
+            TimeoutTrack.obj.tags.splice(index, 1);
+
+            db.swrite( 'LIB-TRACK-' + Catalog.obj.catalog[k].id, TimeoutTrack.obj, function ( ) {
+
+                db.swrite( 'LIB-CATALOG', Catalog.obj );
+
+                } );
+        } else {
+          //break;
+        }
+      }
+
+
+};
+/**/
 app.locals.AudioAccessWatchmanTimeout = setTimeout( function ( ) { app.locals.AudioAccessWatchman( app, db ); }, 0 );
+app.locals.TagsNewRemoverTimeout = setTimeout( function ( ) { app.locals.TagsNewRemover( app, db ); }, 0 );
 app.locals.PlaylistManagerTimeout = setTimeout( function ( ) { app.locals.PlaylistManager( app, db, player ); }, 0 );
 app.locals.PlaylistDesignerTimeout = setTimeout( function ( ) { app.locals.PlaylistDesigner( app, db, player ); }, 0 );
 
