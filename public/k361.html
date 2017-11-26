@@ -94,7 +94,7 @@
                         <md-progress-circular md-mode="indeterminate" md-diameter="{{ !MobileMode && '80' || '60' }}"></md-progress-circular>
                     </div>
 
-                    <md-button ng-style="{ 'transform' : ( ActiveTab==2 && !MobileMode ) && 'scale(1)' || 'scale(0)' }" style="bottom:35px;right:35px;position:fixed" ng-class="{ visible: ( ActiveTab==2 && !MobileMode ) }" class="md-primary md-raised md-fab md-fab-bottom-right fab-top" aria-label="Stwórz ścieżkę" ng-click="CreateTrack($event)"> <!-- EN: Create track -->
+                    <md-button ng-style="{ 'transform' : ( (ActiveTab==2 || ActiveTab==1) && !MobileMode ) && 'scale(1)' || 'scale(0)' }" style="bottom:35px;right:35px;position:fixed" ng-class="{ visible: ( ActiveTab==2 && !MobileMode ) }" class="md-primary md-raised md-fab md-fab-bottom-right fab-top" aria-label="Stwórz ścieżkę" ng-click="CreateTrack($event)"> <!-- EN: Create track -->
                         <md-icon md-svg-icon="images/library-create.svg"></md-icon>
                         <md-tooltip md-direction="left">Stwórz ścieżkę</md-tooltip> <!-- EN: Create track -->
                     </md-button>

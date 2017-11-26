@@ -201,7 +201,7 @@ app.locals.PlaylistManager = function ( app, db, player ) {
                 Next = 1;
                 Current = 0; } }
 
-                if(Schedule.obj.schedule.length == Next  ||   Schedule.obj.schedule[Next].end <= Now || Schedule.obj.schedule[Next].end-Now >= 60000){
+                if(Schedule.obj.schedule.length == Next  ||   Schedule.obj.schedule[Next].end <= Now || Schedule.obj.schedule[Next].end-Now >= 3600000){
                   port.write('-');
               }
 
@@ -624,6 +624,19 @@ app.locals.PlaylistDesigner = function ( app, db, player ) {
       var index;
 
       for(var k = Catalog.obj.catalog.length-1;k>=0;k--){
+
+        var TimeoutTrack = db.sread( 'LIB-TRACK-' + Catalog.obj.catalog[k].id );
+        if(!Catalog.obj.catalog[k].hasOwnProperty('tags')){
+          Catalog.obj.catalog[k].tags = [];
+
+          TimeoutTrack.obj.tags = [];
+
+          db.swrite( 'LIB-TRACK-' + Catalog.obj.catalog[k].id, TimeoutTrack.obj, function ( ) {
+
+              db.swrite( 'LIB-CATALOG', Catalog.obj );
+
+              } );
+        }
 
         if((Catalog.obj.catalog[k].timestamp + 86400000) > NowRemover.getTime()){
           var TrackId = Catalog.obj.catalog[k].id;
