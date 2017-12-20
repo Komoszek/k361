@@ -201,7 +201,7 @@ app.locals.PlaylistManager = function ( app, db, player ) {
                 Next = 1;
                 Current = 0; } }
 
-                if(Schedule.obj.schedule.length == Next  ||   Schedule.obj.schedule[Next].end <= Now || Schedule.obj.schedule[Next].end-Now >= 3600000){
+                if(Schedule.obj.schedule.length == Next  ||   Schedule.obj.schedule[Next].end <= Now || Schedule.obj.schedule[Next].end-Now >= 2400000){
                   port.write('-');
               }
 
