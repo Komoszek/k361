@@ -20,6 +20,26 @@ var app = express();
 var config = require('./config.js');
 var db = require('./db.js'); db.init();
 
+//Function for shuffeling arrays
+function shuffle(array) {
+  var currentIndex = array.length, temporaryValue, randomIndex;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
+}
+
 var SerialPort = require('serialport');
 
 var port = new SerialPort('/dev/ttyUSB0', { autoOpen: false });
@@ -112,9 +132,9 @@ app.locals.AudioAccessWatchman = function ( app, db ) {
         port.write('+');
       }
         if ( app.locals.GetAudioAccessPermission( db ) ) {
+          console.log("BEEP");
 
             Audio.obj.stream.kill();
-
             Audio.obj.playing = false;
             Audio.obj.track = '';
 
@@ -212,8 +232,8 @@ app.locals.PlaylistManager = function ( app, db, player ) {
             if ( Track.valid && Track.obj.state == 'READY' ) {
 
                 Audio.obj.stream = player.play( 'tracks/' + Track.obj.path, { mplayer: [ '-ss', ( Track.obj.begin + Math.floor( ( Now - Schedule.obj.schedule[Current].begin ) / 1000 ) ), '−volume', Track.obj.volume, '-really-quiet' ] }, function( err ) {
-
-                    if ( err && !err.killed ) {
+                    console.log(err.killed);
+                    if ( err && !err.killed && err !== 1 ) {
 
                         var Audio = db.dread( 'PLT-AUDIO' );
 
@@ -242,9 +262,9 @@ app.locals.PlaylistManager = function ( app, db, player ) {
                     var Audio = db.dread( 'PLT-AUDIO' );
 
                     if ( Audio.valid ) {
+                      console.log("booop");
 
                         Audio.obj.stream.kill();
-
                         Audio.obj.playing = false;
                         Audio.obj.track = '';
 
@@ -504,6 +524,8 @@ app.locals.PlaylistDesigner = function ( app, db, player ) {
                 continue; }
 
             LatestTracks.unshift( Schedule.obj.schedule[i].track ); }
+
+            Tracks = shuffle(Tracks);
 
         while ( Intervals.length > 0 ) {
 

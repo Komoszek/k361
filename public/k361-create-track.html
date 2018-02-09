@@ -22,16 +22,6 @@
 
             <md-tabs md-stretch-tabs="always" md-dynamic-height>
 
-                <md-tab label="Plik lokalny">
-
-                    <md-content class="md-padding" style="width:700px;">
-
-                        <p style="font-size:18px;text-align:center;" flex>Dostępne już niedługo!</p> <!-- TODO: UPLOAD -->
-
-                    </md-content>
-
-                </md-tab>
-
                 <md-tab label="Youtube">
 
                     <md-content class="md-padding" style="width:700px;" layout="column" flex>
@@ -60,6 +50,16 @@
                             <md-button class="md-raised md-primary" ng-disabled="DialogForm.YoutubeLink.$invalid" ng-click="respond( { service: 'YOUTUBE', link: YoutubeLink } )">&nbsp;&nbsp;&nbsp;Stwórz ścieżkę&nbsp;&nbsp;&nbsp;</md-button> <!-- EN: Create track -->
                             <span flex></span>
                         </md-input-container>
+
+                    </md-content>
+
+                </md-tab>
+
+                <md-tab label="Plik lokalny">
+
+                    <md-content class="md-padding" style="width:700px;">
+
+                        <p style="font-size:18px;text-align:center;" flex>Dostępne już niedługo!</p> <!-- TODO: UPLOAD -->
 
                     </md-content>
 

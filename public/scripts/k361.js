@@ -1,8 +1,10 @@
 // TODO: TRANSLATE
 
-angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngTagsInput' ] ).controller( 'Controller', [ '$scope', '$http', '$window', '$interval', '$mdSidenav', '$mdDialog', '$mdToast', '$mdMedia', function ( $scope, $http, $window, $interval, $mdSidenav, $mdDialog, $mdToast, $mdMedia ) {
+angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngTagsInput', 'angularViewportWatch'] ).controller( 'Controller', [ '$scope', '$http', '$window', '$interval', '$mdSidenav', '$mdDialog', '$mdToast', '$mdMedia', function ( $scope, $http, $window, $interval, $mdSidenav, $mdDialog, $mdToast, $mdMedia ) {
 
     $scope.$mdMedia = $mdMedia;
+
+    $scope.WindowHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 
     $scope.ActiveTab = 2;
     $scope.ContentReady = false;
@@ -10,6 +12,19 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
 
     $scope.SearchText = '';
     $scope.ToolbarText = 'Życie jest lepsze z muzyką!'; // EN: Life's better with music!
+
+    $scope.SongLimitDefault = Math.ceil(($scope.WindowHeight-144)/88)*2;
+    $scope.SongLimit = $scope.SongLimitDefault;
+
+    $scope.SongBound = 0;
+
+    $scope.LoadMoreSongs = function ( ) {
+      if($scope.SongLimit + 10 > $scope.SongBound){
+        $scope.SongLimit = $scope.SongBound;
+      } else if ($scope.SongLimit !== $scope.SongBound){
+        $scope.SongLimit += 10;
+      }
+    }
 
     $scope.PlaylistControls = {
 
@@ -78,6 +93,10 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
         ];
 
     $scope.ToggleTab = function ( tab ) {
+
+        if($scope.ActiveTab === 2 && tab !== 2){
+          $scope.SongLimit = $scope.SongLimitDefault;
+        }
 
         $scope.ActiveTab = tab;
 
@@ -216,9 +235,12 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
         };
 
     $scope.UpdatePlaylistControls = function ( ) {
-        if ( !$scope.PlaylistControls.Initiated ) {
+        if ( !$scope.PlaylistControls.Initiated  ) {
 
             return; }
+            if ( !$scope.ContentReady  ) {
+                return;
+              }
 
         $scope.PlaylistControls.Days = [];
         $scope.PlaylistControls.Months = [];
@@ -299,6 +321,7 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
           Right = m;
         }
 
+
         if (Left <= Right && Right >= 0 && Left >= 0 && ($scope.Schedule[Left].end > Begin.getTime() && $scope.Schedule[Right].begin < End.getTime())) {
           $scope.PlaylistControls.Schedule = $scope.Schedule.slice(Left, Right + 1);
         }
@@ -307,8 +330,9 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
 
             return; }
 
-        for ( var i = 0; i < $scope.PlaylistControls.Schedule.length; i++ ) {
 
+
+        for ( var i = 0; i < $scope.PlaylistControls.Schedule.length; i++ ) {
             var Element = {
 
                 type: 'TRACK',
@@ -384,7 +408,6 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
                     if ( $scope.Playlist[i+1].type == 'TRACK' ) {
 
                         $scope.Playlist[i].down = $scope.Playlist[i+1].id; } } } }
-
         };
 
     $scope.ValidatePlaylistControls = function ( ) {
@@ -479,6 +502,7 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
 
                 function ( response ) {
 
+                  if(parseInt(response.status) === -1 || parseInt(response.status) === 401)$window.location.href = '/';
                     console.log( "ERROR #" + response.status + " IN ADD_TRACK_TO_PLAYLIST: " + response.data );
 
                     if ( response.status == 409 ) {
@@ -529,6 +553,7 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
                     },
 
                 function ( response ) {
+                  if(parseInt(response.status) === -1 || parseInt(response.status) === 401)$window.location.href = '/';
 
                     console.log( "ERROR #" + response.status + " IN SWAP_TRACKS_IN_PLAYLIST: " + response.data );
 
@@ -562,6 +587,7 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
                     },
 
                 function ( response ) {
+                  if(parseInt(response.status) === -1 || parseInt(response.status) === 401)$window.location.href = '/';
 
                     console.log( "ERROR #" + response.status + " IN REMOVE_TRACK_FROM_PLAYLIST: " + response.data );
 
@@ -590,6 +616,8 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
 
       if ( SearchedText.length >= 3 ) {
 
+        $scope.SongLimit = $scope.SongLimitDefault;
+
         SearchedText = SearchedText.split(':');
         SearchedText[0] = SearchedText[0].trim();
 
@@ -617,10 +645,11 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
           return false;
           });
         }
-
+//$scope.$broadcast('toggleWatchers', true);
       } else {
         $scope.Tracks = $scope.Catalog; }
       };
+
 
     $scope.SearchInPlaylistCatalog = function ( ) {
 
@@ -661,6 +690,7 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
       } else {
         $scope.TracksInPlaylist = $scope.Catalog; }
       };
+
 
     $scope.CreateTrack = function ( event ) {
 
@@ -706,6 +736,7 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
                                         },
 
                                     function ( response ) {
+                                      if(parseInt(response.status) === -1 || parseInt(response.status) === 401)$window.location.href = '/';
 
                                         console.log( "ERROR #" + response.status + " IN CREATE_TRACK: " + response.data );
 
@@ -804,6 +835,7 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
                                 },
 
                             function ( response ) {
+                              if(parseInt(response.status) === -1 || parseInt(response.status) === 401)$window.location.href = '/';
 
                                 console.log( "ERROR #" + response.status + " IN EDIT_TRACK: " + response.data );
 
@@ -847,6 +879,7 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
                 },
 
             function ( response ) {
+              if(parseInt(response.status) === -1 || parseInt(response.status) === 401)$window.location.href = '/';
 
                 console.log( "ERROR #" + response.status + " IN REMOVE_TRACK: " + response.data );
 
@@ -902,6 +935,7 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
                     },
 
                 function ( response ) {
+                  if(parseInt(response.status) === -1 || parseInt(response.status) === 401)$window.location.href = '/';
 
                     console.log( "ERROR #" + response.status + " IN PLAY_NOW: " + response.data );
 
@@ -951,6 +985,7 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
                 },
 
             function ( response ) {
+              if(parseInt(response.status) === -1 || parseInt(response.status) === 401)$window.location.href = '/';
 
                 console.log( "ERROR #" + response.status + " IN STOP_NOW: " + response.data );
 
@@ -1023,6 +1058,7 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
                 },
 
             function ( response ) {
+              if(parseInt(response.status) === -1 || parseInt(response.status) === 401)$window.location.href = '/';
 
                 console.log( "ERROR #" + response.status + " IN CLEAN_PLAYLIST: " + response.data );
 
@@ -1064,6 +1100,7 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
                         },
 
                     function ( response ) {
+                      if(parseInt(response.status) === -1 || parseInt(response.status) === 401)$window.location.href = '/';
 
                         console.log( "ERROR #" + response.status + " IN CLEAR_SERVER_DATA: " + response.data );
 
@@ -1103,6 +1140,7 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
                 },
 
             function ( response ) {
+              if(parseInt(response.status) === -1 || parseInt(response.status) === 401)$window.location.href = '/';
 
                 console.log( "ERROR #" + response.status + " IN SHUTDOWN_SERVER: " + response.data );
 
@@ -1136,6 +1174,7 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
                         },
 
                     function ( subresponse ) {
+                      if(parseInt(response.status) === -1 || parseInt(response.status) === 401)$window.location.href = '/';
 
                         console.log( "ERROR #" + subresponse.status + " IN LOGOUT: " + subresponse.data );
 
@@ -1155,6 +1194,7 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
                 },
 
             function ( response ) {
+              if(parseInt(response.status) === -1 || parseInt(response.status) === 401)$window.location.href = '/';
 
                 console.log( "ERROR #" + response.status + " IN LOGOUT: " + response.data );
 
@@ -1248,7 +1288,11 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
 
                                 return 0; } );
 
-                        $scope.SearchInCatalog(); }
+
+                        $scope.SearchInCatalog();
+                        $scope.SongBound = $scope.Catalog.length;
+
+                      }
 
                     if ( response.data.schedule.timestamp > $scope.Synchronization.schedule ) {
 
@@ -1290,7 +1334,8 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
 
                             $scope.Schedule[i].text = $scope.TimeToText( $scope.GetTimeFromDate( $scope.Schedule[i].begin ), true ) + ' | ' + Title + ' - ' + Author; }
 
-                        $scope.UpdatePlaylistControls(); }
+                        $scope.UpdatePlaylistControls();
+                       }
 
                     if ( response.data.settings.timestamp > $scope.Synchronization.settings ) {
 
@@ -1306,6 +1351,7 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
                     },
 
                 function ( response ) {
+                  if(parseInt(response.status) === -1 || parseInt(response.status) === 401)$window.location.href = '/';
 
                     console.log( "ERROR #" + response.status + " IN SYNCRONIZE_WITH_SERVER: " + response.data );
 
@@ -1366,6 +1412,7 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
                     },
 
                 function ( response ) {
+                  if(parseInt(response.status) === -1 || parseInt(response.status) === 401)$window.location.href = '/';
 
                     console.log( "ERROR #" + response.status + " IN SYNCHRONIZE: " + response.data );
 
@@ -1450,6 +1497,7 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
                         return 0; } );
 
                 $scope.SearchInCatalog();
+                $scope.SongBound = $scope.Catalog.length;
 
                 if ( PlaylistReady ) {
 
@@ -1486,10 +1534,12 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
                             Author = Author.substr( 0, 20 ) + '...'; }
 
                         $scope.Schedule[i].text = $scope.TimeToText( $scope.GetTimeFromDate( $scope.Schedule[i].begin ), true ) + ' | ' + Title + ' - ' + Author; } }
+                        $scope.UpdatePlaylistControls();
 
                 },
 
             function ( response ) {
+              if(parseInt(response.status) === -1 || parseInt(response.status) === 401)$window.location.href = '/';
 
                 console.log( "ERROR #" + response.status + " IN SETUP: " + response.data );
 
@@ -1517,6 +1567,8 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
 
                 $scope.InitPlaylistControls();
 
+
+
                 if ( LibraryReady ) {
 
                     for ( var i = 0; i < $scope.Schedule.length; i++ ) {
@@ -1543,6 +1595,8 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
                         $scope.Schedule[i].author = Author;
                         $scope.Schedule[i].tags = Tags;
 
+
+
                         if ( Title.length > 23 ) {
 
                             Title = Title.substr( 0, 20 ) + '...'; }
@@ -1552,10 +1606,12 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
                             Author = Author.substr( 0, 20 ) + '...'; }
 
                         $scope.Schedule[i].text = $scope.TimeToText( $scope.GetTimeFromDate( $scope.Schedule[i].begin ), true ) + ' | ' + Title + ' - ' + Author; } }
+                        $scope.UpdatePlaylistControls();
 
                 },
 
             function ( response ) {
+              if(parseInt(response.status) === -1 || parseInt(response.status) === 401)$window.location.href = '/';
 
                 console.log( "ERROR #" + response.status + " IN SETUP: " + response.data );
 
@@ -1587,6 +1643,7 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
                 },
 
             function ( response ) {
+              if(parseInt(response.status) === -1 || parseInt(response.status) === 401)$window.location.href = '/';
 
                 console.log( "ERROR #" + response.status + " IN SETUP: " + response.data );
 
@@ -1603,6 +1660,18 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
         $scope.MobileMode = !DesktopMode;
 
         } );
+
+        $scope.$watch( function ( ) { return window.innerHeight }, function( height ) {
+
+            $scope.WindowHeight = height;
+
+            $scope.SongLimitDefault = Math.ceil(($scope.WindowHeight-144)/88)*2;
+
+            if($scope.SongLimit < $scope.SongLimitDefault){
+              $scope.SongLimit = $scope.SongLimitDefault
+            }
+
+            } );
 
     $scope.$watch( function ( ) { return $scope.PlaylistControls.Values; }, function ( ) {
 
@@ -1671,6 +1740,7 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
                     },
 
                 function ( response ) {
+                  if(parseInt(response.status) === -1 || parseInt(response.status) === 401)$window.location.href = '/';
 
                     console.log( "ERROR #" + response.status + " IN SYNCHRONIZE: " + response.data );
 
@@ -1680,7 +1750,26 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
 
         }, true );
 
-    } ] ).config( function( $mdThemingProvider ) {
+    } ] ).directive('onScroll',['$timeout', function ($timeout) {
+    return function (scope, elm, attr) {
+      var raw = elm[0];
+      var Buffering = false;
+
+
+
+      elm.on('scroll', ScrollingFunc = function () {
+
+        if(scope.ActiveTab === 2){
+
+          if(!Buffering && raw.querySelector('#Library').offsetHeight - raw.scrollTop < $scope.WindowHeight){
+            scope.LoadMoreSongs();
+            Buffering = true
+            setTimeout(function(){Buffering = false;ScrollingFunc()},1500);
+          }
+        }
+      });
+    };
+  }]).config( function( $mdThemingProvider ) {
 
         $mdThemingProvider.theme('default')
             .primaryPalette('indigo')
@@ -1777,7 +1866,6 @@ function EditTrackController ( $scope, $http, $mdDialog, track ) {
                 $scope.Track.rate = response.data.rate;
 
                 $scope.TrackReady = true;
-                console.log($scope.Track);
                 },
 
             function ( response ) {
@@ -1857,6 +1945,10 @@ function EditTimeIntervalsController ( $scope, $mdDialog, $mdMedia, intervals ) 
         };
 
     $scope.Validate = function ( ) {
+
+      if($scope.Begin === undefined || $scope.End == undefined){
+        return false;
+      }
 
         var Days = false;
 

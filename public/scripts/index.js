@@ -6,8 +6,9 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria' ] ).c
     $scope.OldPassword = '';
     $scope.NewPassword = '';
 
-    $scope.Login = function ( ) {
+    $scope.Login = function (keyEvent) {
 
+      if(keyEvent === undefined || keyEvent.which === 13 )
         $http.post( '/login', {
 
             password: $scope.Password

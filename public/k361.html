@@ -9,7 +9,7 @@
 
     <link rel="stylesheet" href="static/angular_material/1.1.0/angular-material.min.css" />
     <link rel="stylesheet" href="styles/k361.css" />
-    <link rel="stylesheet" href="http://mbenford.github.io/ngTagsInput/css/ng-tags-input.min.css" />
+    <link rel="stylesheet" href="styles/ng-tags-input.min.css" />
 
     <title>k361</title>
 
@@ -67,7 +67,7 @@
 
             </md-sidenav>
 
-            <md-content layout="column" flex>
+            <md-content layout="column" flex >
 
                 <md-toolbar class="md-hue-2">
 
@@ -88,7 +88,7 @@
 
                 </md-toolbar>
 
-                <md-content style="height:100%;" layout="column">
+                <md-content style="height:100%;" layout="column" on-Scroll>
 
                     <div style="height:100%;" layout="row" layout-align="center center" ng-show="!ContentReady">
                         <md-progress-circular md-mode="indeterminate" md-diameter="{{ !MobileMode && '80' || '60' }}"></md-progress-circular>
@@ -149,7 +149,7 @@
                                                 <md-select style="text-align:center;" name="Track" ng-model="PlaylistControls.Values.track" placeholder="Ścieżka" flex> <!-- EN: Track -->
                                                            <md-input-container class="playlist-search" > <input type="text" ng-model="SearchTextPlaylist" ng-change="SearchInPlaylistCatalog()" ng-keydown="$event.stopPropagation()"/>
                                                          </md-input-container>
-                                                    <md-option ng-value="track.id" ng-repeat="track in TracksInPlaylist">{{ ( track.title.length > 23 ) && ( track.title.substr( 0, 20 ) + '...' ) || track.title }} - {{ ( track.author.length > 23 ) && ( track.author.substr( 0, 20 ) + '...' ) || track.author }}</md-option>
+                                                    <md-option ng-value="track.id" ng-repeat="track in TracksInPlaylist" viewport-watch>{{ (track.title.length > 23 ) && ( track.title.substr( 0, 20 ) + '...' ) || track.title }} - {{ ( track.author.length > 23 ) && ( track.author.substr( 0, 20 ) + '...' ) || track.author }}</md-option>
                                                 </md-select>
 
                                                 <span flex="5"></span>
@@ -230,34 +230,32 @@
 
                         </md-tab>
 
-                        <md-tab md-active="ActiveTab==2" label="Library">
+                        <md-tab md-active="ActiveTab==2" label="Library" >
 
                             <div id="Library" layout="column" layout-align="center none">
-
                                 <div class="search" md-whiteframe="1" flex>
 
                                     <input type="text" ng-model="SearchText" ng-change="SearchInCatalog()" />
 
                                 </div>
 
-                                <div class="list" md-whiteframe="1" flex>
+                                <div class="list" md-whiteframe="1" flex >
 
-                                    <md-list flex vs-repeat>
+                                    <md-list flex md-dynamic-height>
 
-                                        <md-list-item class="md-3-line" ng-repeat="track in Tracks">
+                                        <md-list-item class="md-3-line" ng-repeat="track in Tracks | limitTo:SongLimit track by track.id" viewport-watch>
 
                                             <div class="md-list-item-text" layout="column">
                                                 <h3>{{track.title}}</h3>
                                                 <h4 style="margin: 4px 0 3px;">{{track.author}} - {{track.album}}</h4>
                                                 <p style="font-size:12px;">{{ TimeToWords(track.length) }}</p>
                                             </div>
-
                                             <md-icon md-svg-icon="images/library-add-to-playlist.svg" class="md-secondary" aria-label="Dodaj ścieżkę do playlisty" ng-click="SelectTrack(track.id)"> <!-- EN: Add track to playlist -->
-                                                <md-tooltip ng-style="{ 'display' : !MobileMode && 'initial' || 'none' }" md-direction="bottom">Dodaj ścieżkę do playlisty</md-tooltip> <!-- EN: Add track to playlist -->
+                                                <md-tooltip ng-style="{'display' : !MobileMode && 'initial' || 'none' }" md-direction="bottom">Dodaj ścieżkę do playlisty</md-tooltip> <!-- EN: Add track to playlist -->
                                             </md-icon>
-
+                                            <p></p>
                                             <md-icon md-svg-icon="images/library-{{ ( Audio.playing && Audio.track == track.id ) && 'stop-now' || 'play-now' }}.svg" class="md-secondary" aria-label="Odtwórz lub zatrzymaj odtwarzanie ścieżki" ng-click="ToggleTrack(track.id)"> <!-- EN: Play or stop playing track -->
-                                                <md-tooltip ng-style="{ 'display' : !MobileMode && 'initial' || 'none' }" md-direction="bottom">{{ ( Audio.playing && Audio.track == track.id ) && 'Zatrzymaj odtwarzanie ścieżki' || 'Odtwórz ścieżkę' }}</md-tooltip> <!-- EN: Play track / Stop playing track -->
+                                                <md-tooltip ng-style="{'display' : !MobileMode && 'initial' || 'none' }" md-direction="bottom">{{ ( Audio.playing && Audio.track == track.id ) && 'Zatrzymaj odtwarzanie ścieżki' || 'Odtwórz ścieżkę' }}</md-tooltip><!-- EN: Play track / Stop playing track -->
                                             </md-icon>
 
                                             <md-icon md-svg-icon="images/library-edit.svg" class="md-secondary" aria-label="Edytuj ścieżkę" ng-show="!MobileMode" ng-click="EditTrack(track.id)"> <!-- EN: Edit track -->
@@ -265,7 +263,7 @@
                                             </md-icon>
 
                                             <md-icon md-svg-icon="images/library-remove.svg" class="md-secondary" aria-label="Usuń ścieżkę" ng-show="!MobileMode" ng-click="RemoveTrack(track.id)"> <!-- EN: Remove track -->
-                                                <md-tooltip ng-style="{ 'display' : !MobileMode && 'initial' || 'none' }" md-direction="bottom">Usuń ścieżkę</md-tooltip> <!-- EN: Remove track -->
+                                                <md-tooltip ng-style="{'display' : !MobileMode && 'initial' || 'none' }" md-direction="bottom">Usuń ścieżkę</md-tooltip> <!-- EN: Remove track -->
                                             </md-icon>
 
                                             <md-divider ng-if="!last"></md-divider>
@@ -288,7 +286,7 @@
 
                                     <div layout="row" layout-align="center none" flex="50" flex-sm="100" flex-xs="100">
 
-                                        <div ng-style="{ 'margin-right' : ( ( !$mdMedia('xs') && !$mdMedia('sm') ) && '10px' || '20px' ) }" class="frame" md-whiteframe="1" flex>
+                                        <div ng-style="{'margin-right': ( ( !$mdMedia('xs') && !$mdMedia('sm') ) && '10px' || '20px' ) }" class="frame" md-whiteframe="1" flex>
 
                                             <h2 style="margin-top:0px;">Planowanie playlisty</h2>
 
@@ -448,12 +446,12 @@
 <script src="static/angularjs/1.5.5/angular-animate.min.js"></script>
 <script src="static/angularjs/1.5.5/angular-aria.min.js"></script>
 <script src="static/angular_material/1.1.0/angular-material.min.js"></script>
-<script src="http://mbenford.github.io/ngTagsInput/js/ng-tags-input.min.js"></script>
+<script src="static/ng-tags-input.min.js"></script>
+<script src="static/scrollMonitor.js"></script>
+
+<script src="static/angular-viewport-watch.js"></script>
 
 <script src="scripts/k361.js"></script>
-<script src="scripts/angular-vs-repeat.min.js"></script>
-
-
 
 </body>
 

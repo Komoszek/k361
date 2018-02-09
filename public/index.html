@@ -21,7 +21,11 @@
         <md-content style="max-width:400px;height:220px;" class="md-padding" ng-show="Mode==1" layout="column" layout-align="center center" md-whiteframe="1" flex>
 
             <md-input-container flex="50">
-                <input style="text-align:center;" type="password" aria-label="Hasło" ng-model="Password" required> <!-- EN: Password -->
+                <input style="text-align:center;" type="password" 
+aria-label="Hasło" ng-model="Password" required 
+ng-keydown="Login($event)"> 
+<!-- EN: 
+Password -->
             </md-input-container>
 
             <md-input-container flex="50">

@@ -64,12 +64,14 @@ router.post( '/play', function( req, res ) {
         res.status(500).send('Audio stream is inaccessible!'); return; }
 
     if ( Audio.obj.playing ) {
+      console.log("aaaa");
 
         Audio.obj.stream.kill(); }
 
     Audio.obj.stream = player.play( 'tracks/' + Track.obj.path, { mplayer: [ '-ss', Track.obj.begin, '−volume', Track.obj.volume, '-really-quiet' ] }, function( err ) {
+      console.log(err.killed);
 
-        if ( err && !err.killed ) {
+        if ( err && !err.killed && err !== 1 ) {
 
             var Audio = db.dread( 'PLT-AUDIO' );
 
@@ -80,7 +82,7 @@ router.post( '/play', function( req, res ) {
 
                 db.dwrite( 'PLT-AUDIO', Audio.obj ); }
 
-            console.log( 'While playing track an error occurred: ' + err ); }
+            console.log( 'While playing track an error occurred: ' + err + Track.obj); }
 
         } );
 
@@ -95,7 +97,7 @@ router.post( '/play', function( req, res ) {
         var Audio = db.dread( 'PLT-AUDIO' );
 
         if ( Audio.valid ) {
-
+console.log("kuku");
             Audio.obj.stream.kill();
 
             Audio.obj.playing = false;

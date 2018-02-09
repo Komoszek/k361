@@ -241,8 +241,9 @@ router.get( '/shutdown', function( req, res ) {
     if ( Audio.valid ) {
 
         if ( Audio.obj.playing ) {
-
-            Audio.obj.stream.kill(); } }
+console.log("ggg");
+            Audio.obj.stream.kill();
+          } }
 
     res.sendStatus(200);
 
@@ -264,6 +265,7 @@ router.get( '/reset', function( req, res ) {
     if ( Audio.valid ) {
 
         if ( Audio.obj.playing ) {
+          console.log("lll");
 
             Audio.obj.stream.kill(); } }
 
