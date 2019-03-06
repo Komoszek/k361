@@ -25,7 +25,7 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria' ] ).c
 
                     console.log( "ERROR #" + response.status + " IN LOGIN: " + response.data );
 
-                    $window.location.reload(); // TODO: ERROR MESSAGE
+                //    $window.location.reload(); // TODO: ERROR MESSAGE
 
                     }
 
@@ -44,7 +44,7 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria' ] ).c
 
                 function ( response ) {
 
-                    $window.location.reload();
+                  //  $window.location.reload();
 
                     },
 

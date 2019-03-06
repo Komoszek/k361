@@ -1,4 +1,4 @@
-<md-dialog aria-label="Tworzenie ścieżki"> <!-- EN: Track creation -->
+<md-dialog aria-label="Tworzenie ścieżki" style="width:100%; max-width:700px"> <!-- EN: Track creation -->
 
     <form name="DialogForm" ng-cloak>
 
@@ -20,11 +20,11 @@
 
         <md-dialog-content>
 
-            <md-tabs md-stretch-tabs="always" md-dynamic-height>
+            <md-tabs md-stretch-tabs="always" md-dynamic-height >
 
-                <md-tab label="Youtube">
+                <md-tab label="Youtube" style="position:absolute;">
 
-                    <md-content class="md-padding" style="width:700px;" layout="column" flex>
+                    <md-content class="md-padding" layout="column" flex>
 
                         <p style="font-size:18px;text-align:center;" flex>Po prostu wprowadź link do filmu z serwisu Youtube:</p> <!-- EN: Simply enter a link to Youtube video -->
 
@@ -55,12 +55,15 @@
 
                 </md-tab>
 
-                <md-tab label="Plik lokalny">
+                <md-tab label="Plik lokalny" style="position:absolute;">
 
-                    <md-content class="md-padding" style="width:700px;">
+                    <md-content class="md-padding" >
 
-                        <p style="font-size:18px;text-align:center;" flex>Dostępne już niedługo!</p> <!-- TODO: UPLOAD -->
-
+                      <div ngf-drop ngf-select="uploadFile($file)" ng-model="file" class="drop-box"
+                          ngf-drag-over-class="'dragover'" ngf-multiple="false" ngf-allow-dir="true"
+                          accept=".mp3"
+                          ngf-pattern="'.mp3'">Przeciągnij plik lub kliknij tutaj, aby przesłać</div>
+                      <div ngf-no-file-drop>Upuszczanie i wrzucanie plików jest niedostępne</div>
                     </md-content>
 
                 </md-tab>

@@ -67,11 +67,11 @@ router.post( '/play', function( req, res ) {
       console.log("aaaa");
 
         Audio.obj.stream.kill(); }
-
+	console.log(Track.obj.begin);
     Audio.obj.stream = player.play( 'tracks/' + Track.obj.path, { mplayer: [ '-ss', Track.obj.begin, '−volume', Track.obj.volume, '-really-quiet' ] }, function( err ) {
-      console.log(err.killed);
 
-        if ( err && !err.killed && err !== 1 ) {
+
+                    if ( err && err !== 1  && !err.killed ) {
 
             var Audio = db.dread( 'PLT-AUDIO' );
 

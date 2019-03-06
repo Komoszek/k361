@@ -1,7 +1,9 @@
-console.log( Date() );
 console.log('Launching process');
+console.log( Date() );
 
+var compression = require('compression')
 var express = require('express');
+var minify = require('express-minify');
 var path = require('path');
 var http = require('http');
 var favicon = require('serve-favicon');
@@ -9,6 +11,8 @@ var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var shortid = require('shortid');
 var player = require('play-sound')(opts={});
+var multipart = require('connect-multiparty');
+var busboyBodyParser = require('busboy-body-parser');
 
 var LoginRoute = require('./routes/login.js');
 var LogoutRoute = require('./routes/logout.js');
@@ -19,6 +23,8 @@ var StateRoute = require('./routes/state.js');
 var app = express();
 var config = require('./config.js');
 var db = require('./db.js'); db.init();
+
+app.use(compression());
 
 //Function for shuffeling arrays
 function shuffle(array) {
@@ -60,6 +66,19 @@ port.open(function (err) {
 
 portState='+';
 
+portObj = {
+  main: '+',
+  section:{
+    1: '',
+    2: '',
+    3: '',
+    4: '',
+    5: '',
+    6: '',
+    7: '',
+    8: ''
+  }
+}
 
 // The open event is always emitted
 port.on('open', function() {
@@ -232,8 +251,9 @@ app.locals.PlaylistManager = function ( app, db, player ) {
             if ( Track.valid && Track.obj.state == 'READY' ) {
 
                 Audio.obj.stream = player.play( 'tracks/' + Track.obj.path, { mplayer: [ '-ss', ( Track.obj.begin + Math.floor( ( Now - Schedule.obj.schedule[Current].begin ) / 1000 ) ), '−volume', Track.obj.volume, '-really-quiet' ] }, function( err ) {
-                    console.log(err.killed);
-                    if ( err && !err.killed && err !== 1 ) {
+
+
+                    if ( err && err !== 1  && !err.killed ) {
 
                         var Audio = db.dread( 'PLT-AUDIO' );
 
@@ -740,10 +760,11 @@ app.locals.TagsNewRemoverTimeout = setTimeout( function ( ) { app.locals.TagsNew
 app.locals.PlaylistManagerTimeout = setTimeout( function ( ) { app.locals.PlaylistManager( app, db, player ); }, 0 );
 app.locals.PlaylistDesignerTimeout = setTimeout( function ( ) { app.locals.PlaylistDesigner( app, db, player ); }, 0 );
 
-//app.use( favicon( path.join( __dirname, 'public', 'favicon.ico' ) ) );
+app.use( busboyBodyParser());
 app.use( bodyParser.json() );
 app.use( bodyParser.urlencoded( { extended: true } ) );
 app.use( cookieParser() );
+
 app.use( express.static( path.join( __dirname, 'public' ) ) );
 
 app.use( '/login', LoginRoute );

@@ -1,6 +1,8 @@
 // TODO: TRANSLATE
 
-angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngTagsInput', 'angularViewportWatch'] ).controller( 'Controller', [ '$scope', '$http', '$window', '$interval', '$mdSidenav', '$mdDialog', '$mdToast', '$mdMedia', function ( $scope, $http, $window, $interval, $mdSidenav, $mdDialog, $mdToast, $mdMedia ) {
+angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngTagsInput','ngFileUpload'] ).controller( 'Controller', [ '$scope', '$http', '$window', '$interval', '$mdSidenav', '$mdDialog', '$mdToast', '$mdMedia','Upload', function ( $scope, $http, $window, $interval, $mdSidenav, $mdDialog, $mdToast, $mdMedia, Upload ) {
+
+
 
     $scope.$mdMedia = $mdMedia;
 
@@ -16,13 +18,13 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
     $scope.SongLimitDefault = Math.ceil(($scope.WindowHeight-144)/88)*2;
     $scope.SongLimit = $scope.SongLimitDefault;
 
-    $scope.SongBound = 0;
 
     $scope.LoadMoreSongs = function ( ) {
-      if($scope.SongLimit + 10 > $scope.SongBound){
-        $scope.SongLimit = $scope.SongBound;
-      } else if ($scope.SongLimit !== $scope.SongBound){
-        $scope.SongLimit += 10;
+
+      if($scope.SongLimit + 5 > $scope.Tracks.length){
+        $scope.SongLimit = $scope.Tracks.length;
+      } else if ($scope.SongLimit !== $scope.Tracks.length){
+        $scope.SongLimit += 5;
       }
     }
 
@@ -49,6 +51,10 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
         Initiated: false
 
         };
+
+        $scope.PlaylistControls.Days = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31];
+        $scope.PlaylistControls.Months = [0,1,2,3,4,5,6,7,8,9,10,11];
+
 
     $scope.SettingsBuffer = {
 
@@ -235,6 +241,7 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
         };
 
     $scope.UpdatePlaylistControls = function ( ) {
+
         if ( !$scope.PlaylistControls.Initiated  ) {
 
             return; }
@@ -242,18 +249,21 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
                 return;
               }
 
-        $scope.PlaylistControls.Days = [];
-        $scope.PlaylistControls.Months = [];
+//        $scope.PlaylistControls.Months = [];
 
+        $scope.PlaylistControls.DaysCount = $scope.GetDaysInMonth( $scope.PlaylistControls.Values.month + 1, $scope.PlaylistControls.Values.year );
+
+        /*
         for ( var i = 1; i <= $scope.GetDaysInMonth( $scope.PlaylistControls.Values.month + 1, $scope.PlaylistControls.Values.year ); i++ ) {
 
-            $scope.PlaylistControls.Days.push( i ); }
-
+            $scope.PlaylistControls.Days.push( i ); }*/
+/*
         for ( var i = 0; i <= 11; i++ ) {
 
-            $scope.PlaylistControls.Months.push( i ); }
+            $scope.PlaylistControls.Months.push( i ); }*/
 
         $scope.Playlist = [];
+
         $scope.PlaylistControls.Schedule = [];
 
         if ( $scope.Schedule.length == 0 ) {
@@ -408,6 +418,8 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
                     if ( $scope.Playlist[i+1].type == 'TRACK' ) {
 
                         $scope.Playlist[i].down = $scope.Playlist[i+1].id; } } } }
+
+
         };
 
     $scope.ValidatePlaylistControls = function ( ) {
@@ -573,7 +585,6 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
         };
 
     $scope.RemoveTrackFromPlaylist = function ( track ) {
-
         $http.post( '/playlist/remove', {
 
             id: track
@@ -583,7 +594,6 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
                 function ( response ) {
 
                     // NOTHING
-
                     },
 
                 function ( response ) {
@@ -608,8 +618,101 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
 
 
 //TODO Fix searching to show every track
+
+
+SearchFunction = function(SearchedArray, SearchedText){
+  if(SearchedText === undefined)return;
+  SearchedArray = $scope.Catalog;
+
+  if ( SearchedText.length >= 3 ) {
+
+    SearchedText = SearchedText.toLowerCase();
+
+    SearchedText = SearchedText.split(';');
+
+    for(var i = 0;i<SearchedText.length;i++){
+
+      SearchParameter = SearchedText[i].split(':');
+      SearchParameter[0] = SearchParameter[0].trim();
+
+      if(SearchParameter.length > 1 && SearchParameter[0].toLowerCase() === 'tags'){
+        SearchParameter[1] = SearchParameter[1].trim().replace(/\s+/g,'-');
+
+        SearchedArray = SearchedArray.filter(function(item){
+          if(!item.tags.length || !SearchParameter[1].length)return false;
+
+        for(tags in item.tags){
+          if((item.tags[tags].text.toLowerCase()).indexOf(SearchParameter[1]) > -1)
+            return true;
+        }
+
+        return false;
+        });
+
+      } else if(SearchParameter.length > 1 && SearchParameter[0].toLowerCase() === 'length'){
+
+        SearchParameter[1] = SearchParameter[1].trim().replace(/\s+/g,'').split(',');
+
+        var IsRanged = true;
+        var Values = {'<':'','>':'','=':''};
+        for(var j=0;j<SearchParameter[1].length;j++){
+          var value = parseInt(SearchParameter[1][j].replace(/\D/g,''));
+          if(isNaN(value) || (value === 0 && SearchParameter[1][j].indexOf('>') === -1))continue;
+          if(SearchParameter[1][j].indexOf('>') !== -1){
+            if(IsRanged)
+              Values['>'] = value;
+          } else if(SearchParameter[1][j].indexOf('<') !== -1){
+              if(IsRanged)
+                Values['<'] = value;
+          } else {
+            IsRanged = false;
+            Values['='] = value;
+
+          }
+        }
+
+        SearchedArray = SearchedArray.filter(function(item){
+
+          if(item.length === Values['=']) return true;
+          else if(Values['>'] !== '' && item.length > Values['>'])return true;
+          else if(Values['<'] !== '' && item.length < Values['<'])return true;
+        return false;
+        });
+      }else {
+        SearchedArray = SearchedArray.filter(function(item){
+        if((item.title.toLowerCase()).indexOf(SearchParameter[0]) > -1)
+          return true;
+        if((item.author.toLowerCase()).indexOf(SearchParameter[0]) > -1)
+          return true;
+        if((item.album.toLowerCase()).indexOf(SearchParameter[0]) > -1)
+          return true;
+
+        return false;
+        });
+      }
+
+    }
+
+
+
+//$scope.$broadcast('toggleWatchers', true);
+  }
+    return SearchedArray;
+}
+
+
     $scope.SearchInCatalog = function ( ) {
 
+        $scope.Tracks = SearchFunction($scope.Tracks, $scope.SearchText);
+      if($scope.SearchText.length >= 3){
+        $scope.SongLimit = $scope.SongLimitDefault > $scope.Tracks.length ? $scope.Tracks.length: $scope.SongLimitDefault;
+        } else if($scope.SongLimit < $scope.SongLimitDefault && $scope.Tracks.length > $scope.SongLimitDefault){
+	$scope.SongLimit = $scope.SongLimitDefault;
+}
+
+
+
+/*
       $scope.Tracks = [];
 
       var SearchedText = $scope.SearchText.toLowerCase();
@@ -648,11 +751,14 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
 //$scope.$broadcast('toggleWatchers', true);
       } else {
         $scope.Tracks = $scope.Catalog; }
+*/
       };
 
 
     $scope.SearchInPlaylistCatalog = function ( ) {
+      $scope.TracksInPlaylist = SearchFunction($scope.TracksInPlaylist, $scope.SearchTextPlaylist);
 
+/*
       $scope.TracksInPlaylist = [];
 
       var SearchedText = $scope.SearchTextPlaylist.toLowerCase();
@@ -689,6 +795,8 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
 
       } else {
         $scope.TracksInPlaylist = $scope.Catalog; }
+
+*/
       };
 
 
@@ -770,19 +878,72 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
 
                             }
 
+                        } else if (response.service == 'LOCAL' ){
+                          if (response.file) {
+                            var configgg = {
+                              headers: {'Content-Type': undefined},
+                              transformRequest: []
+                            }
+                            var data = {
+                              service: 'LOCAL'
+                            }
+                                        if (!response.file.$error) {
+                                          $mdToast.show(
+
+                                              $mdToast.simple()
+                                                  .textContent( 'Rozpoczęto wysyłanie pliku ' + response.file.name )
+                                                  .position( 'bottom right' )
+                                                  .hideDelay( 3000 )
+
+                                              );
+
+                                          Upload.upload({
+                    url: '/library/download',
+                    data: {
+                      service: 'LOCAL',
+                      file: response.file
+                    }
+                }).then(
+
+                    function ( response ) {
+
+                        $scope.Downloading.push( response.data );
+                        },
+
+                    function ( response ) {
+                      if(parseInt(response.status) === -1 || parseInt(response.status) === 401)$window.location.href = '/';
+
+                        console.log( "ERROR #" + response.status + " IN CREATE_TRACK: " + response.data );
+
+                        $mdToast.show(
+
+                            $mdToast.simple()
+                                .textContent( 'Podczas tworzenia ścieżki wystąpił błąd! Spróbuj ponownie.' )
+                                .position( 'bottom right' )
+                                .hideDelay( 5000 )
+
+                            );
+
+                        }
+
+                    );
+
+
+
+                                        }
+
+                                  }
                         }
 
                     },
 
                 function ( response ) {
 
-                    // NOTHING
-
                     } );
 
         };
 
-    $scope.EditTrack = function ( track ) {
+    $scope.EditTrack = function ( track, event ) {
 
         $mdDialog.show( {
 
@@ -1260,27 +1421,27 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
 
                             function ( a, b ) {
 
-                              if ( a.title < b.title ) {
+                              if ( a.title.toLowerCase() < b.title.toLowerCase() ) {
 
                                   return -1; }
 
-                              if ( a.title > b.title ) {
+                              if ( a.title.toLowerCase() > b.title.toLowerCase() ) {
 
                                   return 1; }
 
-                                if ( a.author < b.author ) {
+                                if ( a.author.toLowerCase() < b.author.toLowerCase() ) {
 
                                     return -1; }
 
-                                if ( a.author > b.author ) {
+                                if ( a.author.toLowerCase() > b.author.toLowerCase() ) {
 
                                     return 1; }
 
-                                if ( a.album < b.album ) {
+                                if ( a.album.toLowerCase() < b.album.toLowerCase() ) {
 
                                     return -1; }
 
-                                if ( a.album > b.album ) {
+                                if ( a.album.toLowerCase() > b.album.toLowerCase() ) {
 
                                     return 1; }
 
@@ -1290,7 +1451,7 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
 
 
                         $scope.SearchInCatalog();
-                        $scope.SongBound = $scope.Catalog.length;
+                        $scope.SearchInPlaylistCatalog();
 
                       }
 
@@ -1387,7 +1548,6 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
                     else if ( response.data.state == 'READY' ) {
 
                         var Title = response.data.title;
-
                         if ( Title.length > 40 ) {
 
                             Title = Title.substr( 0, 37 ) + '...'; }
@@ -1400,6 +1560,10 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
                                 .hideDelay( 3000 )
 
                             );
+
+                            if(response.data.album === 'Local'){
+                              $scope.EditTrack(response.data.id);
+                            }
 
                         for ( var i = 0; i < $scope.Downloading.length; i++ ) {
 
@@ -1441,7 +1605,6 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
         };
 
     $scope.Setup = function ( ) {
-
         var LibraryReady = false;
         var PlaylistReady = false;
         var SettingsReady = false;
@@ -1468,27 +1631,27 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
 
                     function ( a, b ) {
 
-                      if ( a.title < b.title ) {
+                      if ( a.title.toLowerCase() < b.title.toLowerCase() ) {
 
                           return -1; }
 
-                      if ( a.title > b.title ) {
+                      if ( a.title.toLowerCase() > b.title.toLowerCase() ) {
 
                           return 1; }
 
-                        if ( a.author < b.author ) {
+                        if ( a.author.toLowerCase() < b.author.toLowerCase() ) {
 
                             return -1; }
 
-                        if ( a.author > b.author ) {
+                        if ( a.author.toLowerCase() > b.author.toLowerCase() ) {
 
                             return 1; }
 
-                        if ( a.album < b.album ) {
+                        if ( a.album.toLowerCase() < b.album.toLowerCase() ) {
 
                             return -1; }
 
-                        if ( a.album > b.album ) {
+                        if ( a.album.toLowerCase() > b.album.toLowerCase() ) {
 
                             return 1; }
 
@@ -1497,7 +1660,6 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
                         return 0; } );
 
                 $scope.SearchInCatalog();
-                $scope.SongBound = $scope.Catalog.length;
 
                 if ( PlaylistReady ) {
 
@@ -1755,27 +1917,27 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
       var raw = elm[0];
       var Buffering = false;
 
+      elm.on('scroll', function(){
 
-
-      elm.on('scroll', ScrollingFunc = function () {
-
-        if(scope.ActiveTab === 2){
-
-          if(!Buffering && raw.querySelector('#Library').offsetHeight - raw.scrollTop < $scope.WindowHeight){
-            scope.LoadMoreSongs();
-            Buffering = true
-            setTimeout(function(){Buffering = false;ScrollingFunc()},1500);
+        window.requestAnimationFrame(ScrollingFunc = function (e) {
+          if(scope.ActiveTab === 2){
+            if(raw.querySelector('#Library').offsetHeight - raw.scrollTop -80-88*7 < scope.WindowHeight){
+              scope.LoadMoreSongs();
+            }
           }
-        }
-      });
-    };
-  }]).config( function( $mdThemingProvider ) {
+        });
 
-        $mdThemingProvider.theme('default')
-            .primaryPalette('indigo')
-            .accentPalette('red');
+      });
+
+    };
+  }]).config( function( $mdThemingProvider) {
+
+
+
 
         } );
+
+
 
 function CreateTrackController ( $scope, $mdDialog ) {
 
@@ -1798,6 +1960,24 @@ function CreateTrackController ( $scope, $mdDialog ) {
         $mdDialog.hide( response );
 
         };
+
+        $scope.uploadFile = function(file){
+          $scope.file = file;
+          console.log(file);
+          if(file !== undefined && file !== null){
+            $mdDialog.hide(  { service: 'LOCAL', file: file } );
+          }
+        }
+
+        /*
+        $scope.$watch('file', function () {
+          console.log($scope.file);
+          if($scope.file !== undefined && $scope.file !== null){
+            $mdDialog.hide(  { service: 'LOCAL', file: $scope.file } );
+          } else {
+            $scope.file = undefined;
+          }*/
+
 
     }
 

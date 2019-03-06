@@ -5,10 +5,13 @@ var fs = require('fs');
 var shortid = require('shortid');
 var youtube = require('youtube-mp3-downloader');
 var youtubeInfo = require('youtube-info');
+var sox = require('sox');
 
 var db = require('../db.js'); // LIB-XXX-XXX
 var auth = require('../auth.js');
 var config = require('../config.js');
+
+var child_process = require('child_process');
 
 router.get( '/', function( req, res ) {
 
@@ -20,7 +23,8 @@ router.get( '/', function( req, res ) {
 
     if ( !Catalog.valid ) {
 
-        res.status(500).send('Library catalog is inaccessible!'); return; }
+        res.status(5000).send('Library catalog is inaccessible!');
+return; }
 
     res.json( { catalog: Catalog.obj.catalog, timestamp: Catalog.obj.timestamp } );
 
@@ -36,7 +40,8 @@ router.get( '/tracks', function( req, res ) {
 
     if ( !Catalog.valid ) {
 
-        res.status(500).send('Library catalog is inaccessible!'); return; }
+        res.status(5001).send('Library catalog is inaccessible!');
+return; }
 
     var Tracks = [];
 
@@ -78,7 +83,8 @@ router.post( '/track', function( req, res ) { // { id: STRING, title: STRING, al
 
     if ( !Catalog.valid ) {
 
-        res.status(500).send('Library catalog is inaccessible!'); return; }
+        res.status(5003).send('Library catalog is inaccessible!');
+return; }
 
     var Track = db.sread( 'LIB-TRACK-' + req.body.id );
 
@@ -195,7 +201,6 @@ router.post( '/upload', function( req, res ) {
     } );
 
 router.post( '/download', function( req, res ) { // { service: STRING, code: STRING }
-
     if ( !auth.validate(req) ) {
 
         res.status(401).send('Unauthorized'); return; }
@@ -206,7 +211,8 @@ router.post( '/download', function( req, res ) { // { service: STRING, code: STR
 
         if ( !Catalog.valid ) {
 
-            res.status(500).send('Library catalog is inaccessible!'); return; }
+            res.status(5004).send('Library catalog is inaccessible!');
+return; }
 
         var Track = {
 
@@ -255,6 +261,10 @@ router.post( '/download', function( req, res ) { // { service: STRING, code: STR
                 if ( !Catalog.valid ) {
 
                     console.log( 'While downloading track #' + Track.id + ' an error occurred: Library catalog is inaccessible!' ); return; }
+
+
+                    var GainControl = child_process.exec('mp3gain -s r -r -c "tracks/' + Track.id + '.mp3"');
+                    GainControl.on('exit',function(code, signal){
 
                 youtubeInfo( req.body.code, function ( err, videoInfo ) {
 
@@ -400,6 +410,7 @@ router.post( '/download', function( req, res ) { // { service: STRING, code: STR
                     } );
 
                 console.log( 'Track #' + Track.id + ' has been downloaded. It\'s now ready to use.' );
+              });
 
                 } );
 
@@ -416,10 +427,232 @@ router.post( '/download', function( req, res ) { // { service: STRING, code: STR
 
                 console.log( 'Downloading track ' + Track.id + ' - ' + progress.progress.percentage.toFixed(2) + '%' ); } );
 
-            res.send( Track.id );
+            res.send(Track.id);
 
             } );
 
+        } else if (req.body.service === 'LOCAL'){
+
+              var Catalog = db.sread('LIB-CATALOG');
+
+              if ( !Catalog.valid ) {
+
+                  res.status(5005).send('Library catalog is inaccessible!'); return; }
+
+              var Track = {
+
+                  id: shortid.generate(),
+
+                  title: '',
+                  album: '',
+                  author: '',
+                  tags: [{"text":"new"}],
+
+
+                  length: 0,
+                  begin: 0,
+                  end: 0,
+
+                  volume: 100,
+                  rate: 5,
+                  views: 0,
+
+                  path: '',
+                  state: 'DOWNLOAD'
+
+                  };
+
+              Catalog.obj.tracks.push( Track.id );
+
+              db.swrite( 'LIB-CATALOG', Catalog.obj );
+              db.swrite( 'LIB-TRACK-' + Track.id, Track, function ( ) {
+
+
+
+                fs.writeFile('tracks/' + Track.id + '.mp3', req.files.file.data, function(err) {
+                if(err) {
+                return console.log(err);
+                }
+
+                console.log("The file was saved!");
+
+                      var Catalog = db.sread('LIB-CATALOG');
+
+                      if ( !Catalog.valid ) {
+
+                          console.log( 'While downloading track #' + Track.id + ' an error occurred: Library catalog is inaccessible!' ); return; }
+
+                          var GainControl = child_process.exec('mp3gain -s r -r -c "tracks/' + Track.id + '.mp3"');
+                          GainControl.on('exit',function(code, signal){
+
+                                //SOME FILE
+                      sox.identify( 'tracks/' + Track.id + '.mp3', function ( err, results ) {
+
+                          Track.path = Track.id + '.mp3';
+                          Track.state = 'READY';
+
+                          if ( err ) {
+
+                            console.log(`Current directory: ${process.cwd()}`);
+
+                              var Timestamp = Date.now();
+
+                              Track.title = Track.id;
+                              Track.album = 'Local';
+                              Track.author = 'Unknown';
+                              Track.tags = [];
+                              Track.length = 300;
+                              Track.end = Track.length;
+
+                              Catalog.obj.catalog.push( {
+
+                                  id: Track.id,
+                                  timestamp: Timestamp,
+
+                                  title: Track.title,
+                                  album: Track.album,
+                                  author: Track.author,
+                                  tags: Track.tags,
+                                  length: Track.length
+
+                                  } );
+
+                              Catalog.obj.timestamp = Timestamp;
+
+                              db.swrite( 'LIB-TRACK-' + Track.id, Track, function ( ) {
+
+                                  db.swrite( 'LIB-CATALOG', Catalog.obj );
+
+                                  } );
+
+                              console.log( 'While obtaining track info from Youtube an error occurred: ' + err ); }
+
+                          else {
+
+                              var Timestamp = Date.now();
+//TITLE NAME
+                              Track.title = req.files.file.name.replace(/\.[^/.]+$/, "");
+                              Track.album = 'Local';
+                              Track.author = 'Unknown';
+                              Track.length = Math.ceil(results.duration);
+                              Track.end = Track.length;
+
+                              Catalog.obj.catalog.push( {
+
+                                  id: Track.id,
+                                  timestamp: Timestamp,
+
+                                  title: Track.title,
+                                  album: Track.album,
+                                  author: Track.author,
+                                  tags: Track.tags,
+                                  length: Track.length
+
+                                  } );
+
+
+                              //KOMOSZEK TEMP FIX
+
+
+                              var ViewsSum = 0, ViewsCount = 0;
+
+                              for ( var i = 0; i < Catalog.obj.tracks.length; i++ ) {
+
+                                  var TempTrack = db.sread( 'LIB-TRACK-' + Catalog.obj.tracks[i] );
+
+                                  if ( TempTrack.valid  && TempTrack.obj.state === 'READY') {
+
+                                      ViewsSum += TempTrack.obj.views;
+                                      ViewsCount++;
+                                  }
+                              }
+
+                              if(ViewsCount)Track.views = parseInt(ViewsSum/ViewsCount)+1;
+
+                              Catalog.obj.timestamp = Timestamp;
+
+                              var TrackIndex = Catalog.obj.catalog.length-1;
+                              var TrackId = Track.id;
+
+                              setTimeout((function(TrackIndex,TrackId,Timestamp){
+                                var Catalog = db.sread('LIB-CATALOG');
+                                if(Catalog.obj.catalog.length > 0){
+
+                              var index;
+
+                              if(TrackIndex < Catalog.obj.catalog.length && Catalog.obj.catalog[TrackIndex].id === TrackId){
+                                index = Catalog.obj.catalog[TrackIndex].tags.findIndex(x => x.text=="new");
+                                if(index > -1)
+                                  Catalog.obj.catalog[TrackIndex].tags.splice(index, 1);
+
+                              } else {
+                                var indexa = 0;
+                                var indexb = Catalog.obj.catalog.length-1;
+                                var indexm = Math.floor((indexa + indexb)/2);
+
+                                while( indexa < indexb && Catalog.obj.catalog[indexm].timestamp !== Timestamp){
+                                  if(Catalog.obj.catalog[indexm].timestamp < Timestamp)
+                                    indexa = indexm + 1;
+                                  else
+                                    indexb = indexm - 1;
+
+                                  indexm = Math.floor((indexa + indexb)/2);
+                                }
+                                indexm = Math.floor((indexa + indexb)/2);
+                                  if(Catalog.obj.catalog[indexm].timestamp !== Timestamp)
+                                  return;
+
+                                  index = Catalog.obj.catalog[indexm].tags.findIndex(x => x.text=="new");
+                                  if(index > -1)
+                                    Catalog.obj.catalog[indexm].tags.splice(index, 1);
+                              }
+
+                              var TimeoutTrack = db.sread( 'LIB-TRACK-' + TrackId );
+
+                              index = TimeoutTrack.obj.tags.findIndex(x => x.text=="new");
+                              if(index > -1)
+                                TimeoutTrack.obj.tags.splice(index, 1);
+
+                                db.swrite( 'LIB-TRACK-' + TrackId, TimeoutTrack.obj, function ( ) {
+
+                                    db.swrite( 'LIB-CATALOG', Catalog.obj );
+
+                                    } );
+                              }
+                              }),86400000,TrackIndex,TrackId,Timestamp);
+          //86400000
+                              db.swrite( 'LIB-TRACK-' + Track.id, Track, function ( ) {
+
+                                  db.swrite( 'LIB-CATALOG', Catalog.obj );
+
+                                  } );
+
+                              }
+
+                          } );
+
+                          });
+
+                      console.log( 'Track #' + Track.id + ' has been downloaded. It\'s now ready to use.' );
+
+/*
+                  File.on( 'error', function( error ) {
+
+                      Track.path = Track.id + '.mp3';
+                      Track.state = 'ERROR';
+
+                      db.swrite( 'LIB-TRACK-' + Track.id, Track );
+
+                      console.log( 'While downloading track #' + Track.id + ' an error occurred: ' + error ); } );
+
+                  File.on( 'progress', function( progress ) {
+
+                      console.log( 'Downloading track ' + Track.id + ' - ' + progress.progress.percentage.toFixed(2) + '%' ); } );
+*/
+                });
+                res.send(Track.id);
+
+                } );
         }
 
     else {
@@ -438,7 +671,8 @@ router.post( '/remove', function( req, res ) { // { id: STRING }
 
     if ( !Catalog.valid ) {
 
-        res.status(500).send('Library catalog is inaccessible!'); return; }
+        res.status(5006).send('Library catalog is inaccessible!');
+return; }
 
     var Track = db.sread( 'LIB-TRACK-' + req.body.id );
 
@@ -480,7 +714,8 @@ router.post( '/restore', function( req, res ) { // { id: STRING }
 
     if ( !Catalog.valid ) {
 
-        res.status(500).send('Library catalog is inaccessible!'); return; }
+        res.status(5007).send('Library catalog is inaccessible!');
+return; }
 
     var Track = db.sread( 'LIB-TRACK-' + req.body.id );
 
@@ -537,7 +772,8 @@ router.get( '/clean', function( req, res ) {
 
     if ( !Catalog.valid ) {
 
-        res.status(500).send('Library catalog is inaccessible!'); return; }
+        res.status(5008).send('Library catalog is inaccessible!');
+return; }
 
     console.log('Cleaning library');
 
