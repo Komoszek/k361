@@ -153,12 +153,7 @@ app.locals.AudioAccessWatchman = function ( app, db ) {
         return; }
 
     if ( Audio.obj.playing ) {
-      /*if(portState !== '+'){
-        portState = '+';
-        port.write('+');
-      }*/
         if ( app.locals.GetAudioAccessPermission( db ) ) {
-          console.log("BEEP");
 
             Audio.obj.stream.kill();
             Audio.obj.playing = false;
@@ -181,12 +176,10 @@ app.locals.AudioAccessWatchman = function ( app, db ) {
         if ( !Settings.valid ) {
 
             return 0; }
-
-        if(Settings.obj.settings.amplifier_toggle === 'off' && portState === '+'){
-          portState = '-';
+        if(Settings.obj.settings.amplifier_toggle === 'off'){
           port.write('-');
-        } else if(Settings.obj.settings.amplifier_toggle === 'on' && portState === '-'){
-          portState = '+';
+
+        } else if(Settings.obj.settings.amplifier_toggle === 'on'){
           port.write('+');
         } else if(Settings.obj.settings.amplifier_toggle === 'auto' ){
 
@@ -201,22 +194,17 @@ app.locals.AudioAccessWatchman = function ( app, db ) {
                   continue; }
 
               if ( Settings.obj.settings.reserved_time_intervals[i].begin <= Time && Settings.obj.settings.reserved_time_intervals[i].end >= Time) {
-		if(portState === '+'){
-		portState = '-';
+
                 port.write('-');
-		}
 
 
 
-                return 0;
+                return;
                 } }
 
-          if(portState === '-'){
-
-            portState = '+';
             port.write('+');
-            return 0;
-          }
+            return;
+
 
         }};
 
@@ -325,8 +313,6 @@ app.locals.PlaylistManager = function ( app, db, player ) {
 
 
                     } );
-                  /*  portState = '+';
-                    port.write('+');*/
                 Audio.obj.playing = true;
                 Audio.obj.track = Track.obj.id;
                 Track.obj.views = Track.obj.views + 1;
@@ -339,7 +325,6 @@ app.locals.PlaylistManager = function ( app, db, player ) {
                     var Audio = db.dread( 'PLT-AUDIO' );
 
                     if ( Audio.valid ) {
-                      console.log("booop");
 
                         Audio.obj.stream.kill();
                         Audio.obj.playing = false;
@@ -362,12 +347,7 @@ app.locals.PlaylistManager = function ( app, db, player ) {
         else if ( Next >= 0 && Next < Schedule.obj.schedule.length ) {
 
             app.locals.PlaylistManagerTimeout = setTimeout( function ( ) { app.locals.PlaylistManager( app, db, player ); }, Schedule.obj.schedule[Next].begin - Now ); }
-        } else {
-          console.log('Schedule is empty. Turning off power for audio device');
-            /*portState = '-';
-            port.write('-');*/
         }
-
 
     };
 
@@ -592,8 +572,8 @@ app.locals.PlaylistDesigner = function ( app, db, player ) {
 
                 i--; } }
 
-        var LatestTracks = [];
-
+                var LatestTracks = [];
+        if(Schedule.obj.schedule.length){
         var Left = 0;
         var Right = Schedule.obj.schedule.length - 1;
         var m = Math.floor((Left + Right)/2);
@@ -612,19 +592,22 @@ app.locals.PlaylistDesigner = function ( app, db, player ) {
         for(var i = m-1;i>=MinM;i--){
           LatestTracks.unshift( Schedule.obj.schedule[i].track);
         }
+        /*
         console.log(LatestTracks.length,LatestTracks, Schedule.obj.schedule[m].end);
         if(m > 0)
-          console.log( Schedule.obj.schedule[m-1].end );
-
-      /*  for ( var i = Schedule.obj.schedule.length - 1; i >= 0 && LatestTracks.length < 10; i-- ) { // TODO: CHANGE LINEAR SEARCH TO BINARY SEARCH
+          console.log( Schedule.obj.schedule[m-1].end,'b' );*/
+}
+/*
+        for ( var i = Schedule.obj.schedule.length - 1; i >= 0 && TestTracks.length < 10; i-- ) { // TODO: CHANGE LINEAR SEARCH TO BINARY SEARCH
 
             if ( Schedule.obj.schedule[i].end > Intervals[0].begin ) {
 
                 continue; }
 
-            LatestTracks.unshift( Schedule.obj.schedule[i].track );
+            TestTracks.unshift( Schedule.obj.schedule[i].track );
 
-          }*/
+          }
+*/
 
             Tracks = shuffle(Tracks);
 
@@ -704,32 +687,36 @@ app.locals.PlaylistDesigner = function ( app, db, player ) {
 
             Begin = Midnight.getTime() + Begin * 1000;
             End = Midnight.getTime() + End * 1000;
-
-            var Index = 0;
 /*
-            while ( Index < Schedule.obj.schedule.length ) { // TODO: CHANGE LINEAR SEARCH TO BINARY SEARCH
+            var Kurwix = 0;
+
+            while ( Kurwix < Schedule.obj.schedule.length ) { // TODO: CHANGE LINEAR SEARCH TO BINARY SEARCH
               //Index is index of last element of the schedule that begin before the End
 
-                if ( End > Schedule.obj.schedule[Index].begin ) {
+                if ( End > Schedule.obj.schedule[Kurwix].begin ) {
 
-                    Index++; }
+                    Kurwix++; }
 
                 else {
 
-                    break; }} */
+                    break; }}*/
+
+                    var Index = 0;
+
+
             Left = 0;
-            Right = Schedule.obj.schedule.length-1;
+            Right = Schedule.obj.schedule.length;
+
             var Index = Math.floor((Left + Right)/2);
-            while(Left < Right && Index > 0){
+            while(Left < Right){
               if(End > Schedule.obj.schedule[Index].begin){
                Left = Index + 1;
-             } else if(End < Schedule.obj.schedule[Index].begin && End < Schedule.obj.schedule[Index-1].begin){
+             } else if(Index && End < Schedule.obj.schedule[Index].begin && End < Schedule.obj.schedule[Index-1].begin){
                Right = Index - 1;
+             } else {
+               break;
              }
-
              Index = Math.floor((Left + Right)/2);
-              if(End < Schedule.obj.schedule[Index].begin && End > Schedule.obj.schedule[Index-1].begin)
-                break;
             }
 
             var Entry = {
