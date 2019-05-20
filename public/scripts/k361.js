@@ -1,6 +1,6 @@
 // TODO: TRANSLATE
 
-angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngTagsInput','ngFileUpload'] ).controller( 'Controller', [ '$scope', '$http', '$window', '$interval', '$mdSidenav', '$mdDialog', '$mdToast', '$mdMedia','Upload', function ( $scope, $http, $window, $interval, $mdSidenav, $mdDialog, $mdToast, $mdMedia, Upload ) {
+angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngTagsInput','ngFileUpload','nzToggle','angular-inview','angularViewportWatch'] ).controller( 'Controller', [ '$scope', '$http', '$window', '$interval', '$mdSidenav', '$mdDialog', '$mdToast', '$mdMedia','Upload', function ( $scope, $http, $window, $interval, $mdSidenav, $mdDialog, $mdToast, $mdMedia, Upload ) {
 
 
 
@@ -18,13 +18,13 @@ angular.module('k361', [ 'ngMaterial', 'ngMessages', 'ngAnimate', 'ngAria', 'ngT
     $scope.SongLimitDefault = Math.ceil(($scope.WindowHeight-144)/88)*2;
     $scope.SongLimit = $scope.SongLimitDefault;
 
-
-    $scope.LoadMoreSongs = function ( ) {
-
-      if($scope.SongLimit + 5 > $scope.Tracks.length){
-        $scope.SongLimit = $scope.Tracks.length;
-      } else if ($scope.SongLimit !== $scope.Tracks.length){
-        $scope.SongLimit += 5;
+    $scope.LoadMoreSongs = function (last,inview ) {
+      if(last && inview){
+        if($scope.SongLimit + 5 > $scope.Tracks.length){
+          $scope.SongLimit = $scope.Tracks.length;
+        } else if ($scope.SongLimit !== $scope.Tracks.length){
+          $scope.SongLimit += 5;
+        }
       }
     }
 
@@ -710,93 +710,11 @@ SearchFunction = function(SearchedArray, SearchedText){
 	$scope.SongLimit = $scope.SongLimitDefault;
 }
 
-
-
-/*
-      $scope.Tracks = [];
-
-      var SearchedText = $scope.SearchText.toLowerCase();
-
-      if ( SearchedText.length >= 3 ) {
-
-        $scope.SongLimit = $scope.SongLimitDefault;
-
-        SearchedText = SearchedText.split(':');
-        SearchedText[0] = SearchedText[0].trim();
-
-        if(SearchedText.length > 1 && SearchedText[0].toLowerCase() === 'tags'){
-          SearchedText[1] = SearchedText[1].trim().replace(/\s+/g,'-');
-          $scope.Tracks = $scope.Catalog.filter(function(item){
-            if(!item.tags.length || !SearchedText[1].length)return false;
-
-          for(tags in item.tags){
-            if((item.tags[tags].text.toLowerCase()).indexOf(SearchedText[1]) > -1)
-              return true;
-          }
-
-          return false;
-          });
-        } else {
-          $scope.Tracks = $scope.Catalog.filter(function(item){
-          if((item.title.toLowerCase()).indexOf(SearchedText[0]) > -1)
-            return true;
-          if((item.author.toLowerCase()).indexOf(SearchedText[0]) > -1)
-            return true;
-          if((item.album.toLowerCase()).indexOf(SearchedText[0]) > -1)
-            return true;
-
-          return false;
-          });
-        }
-//$scope.$broadcast('toggleWatchers', true);
-      } else {
-        $scope.Tracks = $scope.Catalog; }
-*/
       };
 
 
     $scope.SearchInPlaylistCatalog = function ( ) {
       $scope.TracksInPlaylist = SearchFunction($scope.TracksInPlaylist, $scope.SearchTextPlaylist);
-
-/*
-      $scope.TracksInPlaylist = [];
-
-      var SearchedText = $scope.SearchTextPlaylist.toLowerCase();
-
-      if ( SearchedText.length >= 3 ) {
-
-        SearchedText = SearchedText.split(':');
-        SearchedText[0] = SearchedText[0].trim();
-
-        if(SearchedText.length > 1 && SearchedText[0].toLowerCase() === 'tags'){
-          SearchedText[1] = SearchedText[1].trim().replace(/\s+/g,'-');
-          $scope.TracksInPlaylist = $scope.Catalog.filter(function(item){
-            if(!item.tags.length || !SearchedText[1].length)return false;
-
-          for(tags in item.tags){
-            if((item.tags[tags].text.toLowerCase()).indexOf(SearchedText[1]) > -1)
-              return true;
-          }
-
-          return false;
-          });
-        } else {
-          $scope.TracksInPlaylist = $scope.Catalog.filter(function(item){
-          if((item.title.toLowerCase()).indexOf(SearchedText[0]) > -1)
-            return true;
-          if((item.author.toLowerCase()).indexOf(SearchedText[0]) > -1)
-            return true;
-          if((item.album.toLowerCase()).indexOf(SearchedText[0]) > -1)
-            return true;
-
-          return false;
-          });
-        }
-
-      } else {
-        $scope.TracksInPlaylist = $scope.Catalog; }
-
-*/
       };
 
 
@@ -1374,6 +1292,10 @@ SearchFunction = function(SearchedArray, SearchedText){
 
         };
 
+    $scope.ChangeAmplifireMode = function(){
+      $scope.Settings.amplifier_toggle = $scope.amplifierToggle;
+    };
+
     $scope.Synchronize = function ( ) {
         $http.post( '/state/synchronize', {
 
@@ -1454,7 +1376,6 @@ SearchFunction = function(SearchedArray, SearchedText){
                         $scope.SearchInPlaylistCatalog();
 
                       }
-
                     if ( response.data.schedule.timestamp > $scope.Synchronization.schedule ) {
 
                         $scope.Schedule = response.data.schedule.data;
@@ -1497,12 +1418,13 @@ SearchFunction = function(SearchedArray, SearchedText){
 
                         $scope.UpdatePlaylistControls();
                        }
-
+                    //   console.log($scope.SettingsLastSync,$scope.Settings); //TODO
                     if ( response.data.settings.timestamp > $scope.Synchronization.settings ) {
 
                         $scope.SettingsBuffer.hold = true;
 
                         $scope.Settings = response.data.settings.data;
+                        $scope.SettingsLastSync = JSON.parse(JSON.stringify(response.data.settings.data));
                         $scope.Synchronization.settings = response.data.settings.timestamp;
 
                         $scope.SettingsBuffer.playlist_designer_launch_time = $scope.TimeToText( $scope.Settings.playlist_designer_launch_time,true ); }
@@ -1790,6 +1712,11 @@ SearchFunction = function(SearchedArray, SearchedText){
                 $scope.SettingsBuffer.hold = true;
 
                 $scope.Settings = response.data.settings;
+
+                $scope.SettingsLastSync = JSON.parse(JSON.stringify(response.data.settings));
+
+                $scope.amplifierToggle = $scope.Settings.amplifier_toggle;
+
                 $scope.Synchronization.settings = response.data.timestamp;
 
                 $scope.SettingsBuffer.playlist_designer_launch_time = $scope.TimeToText( $scope.Settings.playlist_designer_launch_time,true );
@@ -1878,20 +1805,30 @@ SearchFunction = function(SearchedArray, SearchedText){
         } );
 
     $scope.$watch( function ( ) { return $scope.Settings; }, function ( ) {
+      //Known problems - objects are
+      var SettingsChanges = {};
 
-        if ( angular.equals( $scope.Settings, {} ) ) {
 
-            return; }
-
-        if ( $scope.SettingsBuffer.hold ) {
-
+        /*if ( $scope.SettingsBuffer.hold ) {
+          console.log("DUPA");
             $scope.SettingsBuffer.hold = false;
 
-            return; }
+            return; }*/
 
+            for (var prop in $scope.Settings) {
+              if(!angular.equals($scope.Settings[prop], $scope.SettingsLastSync[prop])){
+                SettingsChanges[prop] = $scope.Settings[prop];
+                break;
+              }
+            }
+
+            if ( angular.equals( SettingsChanges, {} ) ) {
+                return; }
+
+            $scope.SettingsLastSync = JSON.parse(JSON.stringify($scope.Settings));
         $http.post( '/state', {
 
-            settings: $scope.Settings
+            settings: SettingsChanges
 
             } ).then(
 
@@ -1912,16 +1849,17 @@ SearchFunction = function(SearchedArray, SearchedText){
 
         }, true );
 
-    } ] ).directive('onScroll',['$timeout', function ($timeout) {
+    } ] )/*.directive('onScroll',function () {
     return function (scope, elm, attr) {
       var raw = elm[0];
       var Buffering = false;
 
       elm.on('scroll', function(){
-
         window.requestAnimationFrame(ScrollingFunc = function (e) {
           if(scope.ActiveTab === 2){
-            if(raw.querySelector('#Library').offsetHeight - raw.scrollTop -80-88*7 < scope.WindowHeight){
+
+            //-80-88*7
+            if(raw.querySelector('#Library').offsetHeight - raw.scrollTop -696 < scope.WindowHeight){
               scope.LoadMoreSongs();
             }
           }
@@ -1930,14 +1868,108 @@ SearchFunction = function(SearchedArray, SearchedText){
       });
 
     };
-  }]).config( function( $mdThemingProvider) {
+  })
+*/
+  .directive('inputslider',function () {
+  return {
+    require: ['ngModel'],
+    scope: {
+      max:'@',
+      format: '@'
+    },
+    link: function (scope, elm, attr, ctrls) {
+     var ngModelCtrl = ctrls[0];
+     var MaxValue = parseInt(scope.max);
+
+
+     attr.$observe('max', function(value){
+				MaxValue = parseInt(scope.max);
+			});
+
+              if(scope.format === 'rate'){
+                var formatter = function (value){
+
+                  var newValue = value.toString().match(/\d{1,2}/);
+                    return newValue == null ? '0/'+MaxValue : (newValue[0] > 10 ? '10/'+MaxValue : newValue[0]+'/'+MaxValue);
+                }
+                var parser = function (value){
+
+                    var newValue = parseInt(value.toString().match(/\d{1,2}/));
+
+                    return isNaN(newValue) ? 0 : (newValue > MaxValue ? 10 : newValue);
+                }
+
+                elm.on("blur", function () {
+                  ngModelCtrl.$setViewValue(formatter(this.value));
+                  ngModelCtrl.$render();
+
+                }).on("focus", function () {
+                    ngModelCtrl.$setViewValue(parser(this.value));
+                    ngModelCtrl.$render();
+                });
+              } else if(scope.format === 'time'){
+                formatter = function ( time ) {
+
+                    if(time > MaxValue)
+                      time = MaxValue;
+
+                    var Text = '';
+
+                    if ( time > 3600 ) {
+
+                        var Hours = String( Math.floor( time / 3600 ) );
+                        var Minutes = ( '0' + String( Math.floor( ( time % 3600 ) / 60 ) ) ).substr( -2, 2 );
+                        var Seconds = ( '0' + String( Math.floor( time % 60 ) ) ).substr( -2, 2 );
+
+                        if ( Hours.length == 1 ) {
+
+                            Hours = '0' + Hours; }
+
+                        Text = Hours + ':' + Minutes + ':' + Seconds; }
+
+                    else {
+
+                        var Minutes = ( '0' + String( Math.floor( ( time % 3600 ) / 60 ) ) ).substr( -2, 2 );
+                        var Seconds = ( '0' + String( Math.floor( time % 60 ) ) ).substr( -2, 2 );
+
+                        Text = Minutes + ':' + Seconds; }
+
+                    return Text;
+
+                    };
+
+                    parser = function(value) {
+
+                      value = value.split(':');
+                      var timeSum = 0;
+
+                      for(var i =0;i<value.length;i++){
+
+                        timeSum *= 60;
+                        if(isNaN(parseInt(value[i])))
+                          continue;
+                        timeSum += parseInt(value[i]);
+                      }
+
+                      return timeSum > MaxValue ? MaxValue : timeSum;
+
+                    }
+
+                    elm.on("blur", function () {
+                      ngModelCtrl.$setViewValue(formatter(parser(this.value)));
+                      ngModelCtrl.$render();
+                    });
+              }
+                ngModelCtrl.$formatters.push(formatter);
+
+                ngModelCtrl.$parsers.push(parser);
+  }
 
 
 
-
+};
+}).config( function( $mdThemingProvider) {
         } );
-
-
 
 function CreateTrackController ( $scope, $mdDialog ) {
 
@@ -1963,7 +1995,7 @@ function CreateTrackController ( $scope, $mdDialog ) {
 
         $scope.uploadFile = function(file){
           $scope.file = file;
-          console.log(file);
+
           if(file !== undefined && file !== null){
             $mdDialog.hide(  { service: 'LOCAL', file: file } );
           }
@@ -1971,7 +2003,7 @@ function CreateTrackController ( $scope, $mdDialog ) {
 
         /*
         $scope.$watch('file', function () {
-          console.log($scope.file);
+
           if($scope.file !== undefined && $scope.file !== null){
             $mdDialog.hide(  { service: 'LOCAL', file: $scope.file } );
           } else {

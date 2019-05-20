@@ -12,6 +12,8 @@
     <link rel="stylesheet" href="styles/k361.css" defer/>
     <link rel="stylesheet" href="styles/ng-tags-input.min.css" defer/>
 
+    <link rel="stylesheet" type="text/css" href="styles/nz-toggle.min.css" defer/>
+
     <title>k361</title>
 </head>
 <body ng-app="k361">
@@ -67,7 +69,7 @@
                         <md-icon md-svg-icon="images/library-create.svg"></md-icon>
                         <md-tooltip md-direction="left">Stwórz ścieżkę</md-tooltip> <!-- EN: Create track -->
                     </md-button>
-                <md-content id="ContentContainer" layout="column" on-Scroll>
+                <md-content id="ContentContainer" layout="column">
                     <div style="height:100%;" layout="row" layout-align="center center" ng-if="!ContentReady">
                         <md-progress-circular md-mode="indeterminate" md-diameter="{{ !MobileMode && '80' || '60' }}"></md-progress-circular>
                     </div>
@@ -96,7 +98,7 @@
                                         <div ng-style="{ 'border-left' : ( ( !$mdMedia('xs') && !$mdMedia('sm') ) && 'solid 1px rgba(0,0,0,0.12)' || 'none' ), 'border-top' : ( ( !$mdMedia('xs') && !$mdMedia('sm') ) && 'none' || 'solid 1px rgba(0,0,0,0.12)' ) }" layout="row" layout-align="center center" flex="50" flex-sm="100" flex-xs="100">
                                             <form name="PlaylistControlsForm" layout="row" layout-align="center center" layout-fill>
                                                 <md-select style="text-align:center;margin-left:5%;margin-right:2.5%" name="Track" ng-model="PlaylistControls.Values.track" placeholder="Ścieżka" flex> <!-- EN: Track -->
-                                                           <md-input-container class="playlist-search" > <input type="text" ng-model="SearchTextPlaylist" ng-change="SearchInPlaylistCatalog()" ng-keydown="$event.stopPropagation()"/>
+                                                           <md-input-container class="playlist-search" > <input type="text" ng-model="SearchTextPlaylist" ng-change="SearchInPlaylistCatalog()" ng-keydown="$event.stopPropagation()" aria-label="Wyszukaj w playliście"/>
                                                          </md-input-container>
                                                     <md-option ng-value="track.id" ng-repeat="track in TracksInPlaylist track by track.id"  viewport-watch >{{ (track.title.length > 23 ) && ( track.title.substr( 0, 20 ) + '...' ) || track.title }} - {{ ( track.author.length > 23 ) && ( track.author.substr( 0, 20 ) + '...' ) || track.author }}</md-option>
                                                 </md-select>
@@ -115,7 +117,7 @@
                                                 <md-input-container style="margin-top:17px;margin-bottom:0;" ng-show="PlaylistControls.Values.order<1||PlaylistControls.Values.order>3" flex>
                                                     <input aria-label="Puste pole" ng-disabled="true"> <!-- EN: Empty input -->
                                                 </md-input-container>
-                                                <md-button style="max-width:70px;margin-top:0;margin-bottom:0;margin-left:2.5%;margin-right:5%;" class="md-primary md-raised" aria-label="Dodaj ścieżkę do playlisty" ng-disabled="!ValidatePlaylistControls()" ng-click="AddTrackToPlaylist()" flex> <!-- EN: Add track to playlist -->
+                                                <md-button style="max-width:70px;margin-top:0;margin-bottom:0;margin-left:2.5%;margin-right:5%;" class="md-primary md-raised" aria-label="Dodaj ścieżkę do playlisty" ng-disabled="!ValidatePlaylistControls()" ng-click="AddTrackToPlaylist()" > <!-- EN: Add track to playlist -->
                                                     Dodaj
                                                 </md-button>
                                             </form>
@@ -144,13 +146,13 @@
                                     </md-list>
                             </div>
                         </md-tab>
-                        <md-tab md-active="ActiveTab==2" label="Library">
-                            <div id="Library" layout="column" layout-align="center none">
+                        <md-tab md-active="ActiveTab==2" label="Library" in-view-container>
+                            <div id="Library" layout="column" layout-align="center none" >
                                 <div class="search" md-whiteframe="1" flex>
                                     <input type="text" ng-model="SearchText" ng-change="SearchInCatalog()" />
                                 </div>
-                                    <md-list class="list" md-whiteframe="1" flex md-dynamic-height>
-                                        <md-list-item class="md-3-line" ng-repeat="track in Tracks | limitTo:SongLimit  track by track.id" viewport-watch>
+                                    <md-list class="list" md-whiteframe="1" flex md-dynamic-height  >
+                                        <md-list-item class="md-3-line" ng-repeat="track in Tracks | limitTo:SongLimit  track by track.id" viewport-watch in-view="LoadMoreSongs($last, $inview)">
                                             <div class="md-list-item-text" layout="column">
                                                 <h3>{{track.title}}</h3>
                                                 <h4>{{track.author}} - {{track.album}}</h4>
@@ -240,7 +242,7 @@
 
                                                 <div style="margin-top:10px;margin-bottom:10px;" layout="row" flex>
                                                     <div style="width:180px;margin-right:auto;margin-left:auto" layout="row">
-                                                        <md-button class="md-primary md-raised" aria-label="Wyczyść playlistę" ng-click="CleanPlaylist()" flex> <!-- EN: Clean playlist -->
+                                                        <md-button style="margin-left:auto;margin-right:auto;width:auto;" class="md-primary md-raised" aria-label="Wyczyść playlistę" ng-click="CleanPlaylist()"> <!-- EN: Clean playlist -->
                                                             Wyczyść playlistę <!-- EN: Clean playlist -->
                                                         </md-button>
                                                     </div>
@@ -256,7 +258,7 @@
 
                                                 <div style="margin-top:10px;margin-bottom:10px;" layout="row" flex>
                                                     <div style="width:315px;margin-left:auto;margin-right:auto" layout="row">
-                                                        <md-button class="md-primary md-raised" aria-label="Wyłącz serwer" ng-click="ShutdownServer()" flex> <!-- EN: Shutdown server -->
+                                                        <md-button style="margin-left:auto;margin-right:auto; width:auto;" class="md-primary md-raised" aria-label="Wyłącz serwer" ng-click="ShutdownServer()"> <!-- EN: Shutdown server -->
                                                             Wyłącz serwer <!-- EN: Shutdown server -->
                                                         </md-button>
                                                       <!--  <md-button class="md-primary md-raised" aria-label="Wyczyść dane" ng-click="ClearServerData($event)" flex>
@@ -268,6 +270,33 @@
                                                 Naciśnięcie dowolnego z powyższych przycisków doprowadzi do przerwania działania serwera i natychmiastowego wylogowania użytkownika.
 
                                             </div>
+
+                                            <h2>Tryb Przekaźnika</h2>
+
+                                            <div style="margin-left:10px;margin-bottom:5px;" layout="column" flex>
+
+                                              Zmienia tryb działania przekaźnika.
+                                              <ul>
+                                                <li>OFF - Wzmazniacz zawsze wyłączony.</li>
+                                                <li>Auto - Wzmacniacz wyłączony podczas zastrzeżonych godzin.</li>
+                                                <li>ON - Wzmacniacz zawsze włączony.</li>
+                                              </ul>
+
+                                              <div style="margin-top:10px;margin-bottom:10px;" layout="row" flex>
+                                                <div style="width:315px;margin-left:auto;margin-right:auto" layout="row"  layout-align="center center" >
+
+                                            <nz-toggle ng-model="amplifierToggle" tri-toggle val-true="'on'" val-false="'off'" val-null="'auto'" color-false="'#f15854'"  color-null="'#3f51b5'" color-true="'#60bd68'" tip-false="'OFF'" tip-null="'Auto'" tip-true="'ON'">
+                                            </nz-toggle>
+
+                                            <md-button class="md-primary md-raised" ng-disabled="amplifierToggle == Settings.amplifier_toggle" aria-label="Zatwierdź" ng-click="ChangeAmplifireMode()"> <!-- EN: Shutdown server -->
+                                                Zatwierdź <!-- EN: Apply -->
+                                            </md-button>
+                                          </div>
+
+                                          </div>
+
+                                          </div>
+
                                         </div>
                                     </div>
                                 </div>
@@ -286,15 +315,18 @@
 
 
     <script src="static/angular_material/1.1.0/angular-material.min.js" defer></script>
+    <script type="text/javascript" src="static/nz-toggle.min.js" defer></script>
+
 
     <script src="static/ng-tags-input.min.js" defer></script>
 
-
     <script src="static/scrollMonitor.js" defer></script>
     <script src="static/ng-file-upload.min.js" defer></script>
-<script src="static/angular-viewport-watch.js" defer></script>
+    <script src="static/angular-viewport-watch.js" defer></script>
 
-<script src="scripts/k361.js" defer></script>
+    <script src="static/angular-inview.js" defer></script>
+
+    <script src="scripts/k361.js" defer></script>
 </body>
 
 </html>

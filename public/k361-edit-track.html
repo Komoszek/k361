@@ -88,93 +88,59 @@
 
                 </div>
 
-                <div style="margin-top:10px;" layout="row" ng-show="TrackReady">
-
-                    <span flex></span>
-
-                    <div layout="row" flex="90">
-
-                        <div layout="row" layout-align="left center" flex="15">
+                <md-slider-container style="margin-top:10px;" layout="row" ng-show="TrackReady">
+                  <span flex></span>
+                        <div layout="row" layout-align="center center" flex="90">
+                          <div layout="row" layout-align="left center" flex="15">
                             <span>Początek</span> <!-- EN: Beginning -->
+                            </div>
+                            <md-slider id="start-slider" class="md-primary" aria-label="Początek" ng-model="Track.begin" step="1" min="0" max="{{Track.length}}" flex></md-slider> <!-- EN: End -->
+                        <div layout="row" layout-align="center center" flex="15" style="max-width:15%!important;" >
+                        <md-input-container style="margin:0" flex="80">
+                            <input style="text-align:center" type="text" inputslider format="time" ng-model="Track.begin" aria-label="Początek" aria-controls="start-slider" min="0" max="{{Track.length}}">
+                        </md-input-container>
                         </div>
-
-                        <md-slider class="md-primary" aria-label="Początek" ng-model="Track.begin" step="1" min="0" max="{{Track.length}}" flex></md-slider> <!-- EN: Beginning -->
-
-                        <div layout="row" layout-align="center center" flex="15">
-                            <span>{{TimeToText(Track.begin)}}</span>
                         </div>
+                        <span flex></span>
 
-                    </div>
+                </md-slider-container>
 
-                    <span flex></span>
-
-                </div>
-
-                <div layout="row" ng-show="TrackReady">
-
-                    <span flex></span>
-
-                    <div layout="row" flex="90">
-
-                        <div layout="row" layout-align="left center" flex="15">
+                <md-slider-container layout="row" ng-show="TrackReady">
+                  <span flex></span>
+                        <div layout="row" layout-align="center center" flex="90">
+                          <div layout="row" layout-align="left center" flex="15">
                             <span>Koniec</span> <!-- EN: End -->
+                            </div>
+                            <md-slider id="end-slider" ng-class="{ 'md-primary' : ( Track.end >= Track.begin ), 'md-secondary' : ( Track.end < Track.begin ) }" aria-label="Koniec" ng-model="Track.end" step="1" min="0" max="{{Track.length}}" flex></md-slider> <!-- EN: End -->
+                        <div layout="row" layout-align="center center" flex="15" style="max-width:15%!important;" >
+                        <md-input-container style="margin:0" flex="80">
+                            <input style="text-align:center" type="text" inputslider format="time" ng-model="Track.end" aria-label="Koniec" aria-controls="end-slider" min="0" max="{{Track.length}}">
+                        </md-input-container>
                         </div>
-
-                        <md-slider ng-class="{ 'md-primary' : ( Track.end >= Track.begin ), 'md-secondary' : ( Track.end < Track.begin ) }" aria-label="Koniec" ng-model="Track.end" step="1" min="0" max="{{Track.length}}" flex></md-slider> <!-- EN: End -->
-
-                        <div layout="row" layout-align="center center" flex="15">
-                            <span>{{TimeToText(Track.end)}}</span>
                         </div>
+                        <span flex></span>
 
-                    </div>
+                </md-slider-container>
 
-                    <span flex></span>
 
-                </div>
-
-                <div layout="row" ng-show="TrackReady">
-
-                    <span flex></span>
-
-                    <div layout="row" flex="90">
-
-                        <div layout="row" layout-align="left center" flex="15">
-                            <span>Głośność</span> <!-- EN: Volume -->
-                        </div>
-
-                        <md-slider class="md-primary" aria-label="Głośność" ng-model="Track.volume" step="1" min="0" max="100" flex></md-slider> <!-- EN: Volume -->
-
-                        <div layout="row" layout-align="center center" flex="15">
-                            <span>{{Track.volume}}%</span>
-                        </div>
-
-                    </div>
-
-                    <span flex></span>
-
-                </div>
-
-                <div layout="row" ng-show="TrackReady">
-
-                    <span flex></span>
-
-                    <div layout="row" flex="90">
-
-                        <div layout="row" layout-align="left center" flex="15">
+                <md-slider-container layout="row" ng-show="TrackReady">
+                  <span flex></span>
+                        <div layout="row" layout-align="center center" flex="90">
+                          <div layout="row" layout-align="left center" flex="15">
                             <span>Ocena</span> <!-- EN: Rate -->
+                            </div>
+                        <md-slider id="rate-slider" class="md-primary" aria-label="Ocena" ng-model="Track.rate" step="1" min="0" max="10" flex></md-slider> <!-- EN: Rate -->
+                        <div layout="row" layout-align="center center" flex="15" style="max-width:15%!important;" >
+                        <md-input-container style="margin:0" flex="80">
+                            <input style="text-align:center" type="text" inputslider format="rate" ng-model="Track.rate" aria-label="Ocena" aria-controls="rate-slider" min="0" max="10">
+                        </md-input-container>
                         </div>
-
-                        <md-slider class="md-primary" aria-label="Ocena" ng-model="Track.rate" step="1" min="0" max="10" flex></md-slider> <!-- EN: Rate -->
-
-                        <div layout="row" layout-align="center center" flex="15">
-                            <span>{{Track.rate}}/10</span>
                         </div>
+                        <span flex></span>
 
-                    </div>
+                </md-slider-container>
 
-                    <span flex></span>
 
-                </div>
 
                 <md-input-container ng-show="TrackReady" layout="row" flex>
                     <span flex></span>

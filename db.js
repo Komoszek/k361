@@ -33,6 +33,7 @@ db.reset = function ( ) {
         { id: 'STE-SETTINGS', obj: { settings: {
 
             playlist_designer: false,
+            amplifier_toggle: 'auto',
             playlist_designer_launch_time: 10800,
             playlist_designer_time_intervals: [],
             reserved_time_intervals: [],
@@ -55,7 +56,7 @@ db.swap = function ( mem, i, j ) {
 
     };
 
-db.read = function ( mem, id, json_friendly ) { // TODO: CHANGE LINEAR SEARCH TO BINARY SEARCH
+db.read = function ( mem, id, json_friendly ) {
 
     if ( id === undefined || id === '' ) {
 
@@ -63,79 +64,107 @@ db.read = function ( mem, id, json_friendly ) { // TODO: CHANGE LINEAR SEARCH TO
 
     var data = { id: id, obj: {}, valid: false };
 
-    for ( var i = 0; i < mem.length; i++ ) {
+    var Left = 0;
+    var Right = mem.length-1;
+    var m = Math.floor((Left+Right)/2)
 
-        if ( mem[i].id == id ) {
+    while(Left < Right){
+      if(mem[m].id > id){
+        Right = m-1;
+      } else if(mem[m].id < id){
+        Left = m+1;
+      } else {
+        break;
+      }
+      m = Math.floor((Left+Right)/2);
+    }
 
-            if ( typeof( json_friendly ) != 'boolean' ) {
+    if(mem[m] !== undefined && mem[m].id === id){
+      if ( typeof( json_friendly ) != 'boolean' ) {
 
-                data.obj = JSON.parse( JSON.stringify( mem[i].obj ) ); }
+          data.obj = JSON.parse( JSON.stringify( mem[m].obj ) ); }
 
-            else if ( json_friendly ) {
+      else if ( json_friendly ) {
 
-                data.obj = JSON.parse( JSON.stringify( mem[i].obj ) ); }
+          data.obj = JSON.parse( JSON.stringify( mem[m].obj ) ); }
 
-            else {
+      else {
 
-                data.obj = mem[i].obj; }
+          data.obj = mem[m].obj; }
 
-            data.valid = true;
+      data.valid = true;
 
-            if ( i > 0 ) {
-
-                db.swap( mem, i, i - 1 ); }
-
-            break; } }
+    }
 
     return data;
 
     };
 
-db.write = function ( mem, id, obj, json_friendly ) { // TODO: CHANGE LINEAR SEARCH TO BINARY SEARCH AND USE BINARY INSERTION AFTERWARDS
+db.write = function ( mem, id, obj, json_friendly ) {
 
     if ( id === undefined || id === '' ) {
 
         return; }
 
-    for ( var i = 0; i < mem.length; i++ ) {
+        var Left = 0;
+        var Right = mem.length-1;
+        var m = Math.floor((Left+Right)/2)
 
-        if ( mem[i].id == id ) {
+        while(Left < Right){
+          if(mem[m].id > id){
+            Right = m-1;
+          } else if(mem[m].id < id){
+            Left = m+1;
+          } else {
+            break;
+          }
+          m = Math.floor((Left+Right)/2);
+        }
 
-            if ( typeof( json_friendly ) != 'boolean' ) {
+        if(mem[m] !== undefined && mem[m].id == id){
+          if ( typeof( json_friendly ) != 'boolean' ) {
 
-                mem[i].obj = JSON.parse( JSON.stringify( obj ) ); }
+              mem[m].obj = JSON.parse( JSON.stringify( obj ) ); }
 
-            else if ( json_friendly ) {
+          else if ( json_friendly ) {
 
-                mem[i].obj = JSON.parse( JSON.stringify( obj ) ); }
+              mem[m].obj = JSON.parse( JSON.stringify( obj ) ); }
 
-            else {
+          else {
 
-                mem[i].obj = obj; }
+              mem[m].obj = obj; }
 
-            if ( i > 0 ) {
 
-                db.swap( mem, i, i - 1 ); }
-
-            return; } }
-
-    mem.push( { id: id, obj: obj } );
+        } else {
+        mem.splice( m, 0, { id: id, obj: obj });
+      }
 
     };
 
-db.remove = function ( mem, id ) { // TODO: CHANGE LINEAR SEARCH TO BINARY SEARCH
+db.remove = function ( mem, id ) {
 
     if ( id === undefined || id === '' ) {
 
         return; }
 
-    for ( var i = 0; i < mem.length; i++ ) {
+        var Left = 0;
+        var Right = mem.length-1;
+        var m = Math.floor((Left+Right)/2)
 
-        if ( mem[i].id == id ) {
+        while(Left < Right){
+          if(mem[m].id > id){
+            Right = m-1;
+          } else if(mem[m].id < id){
+            Left = m+1;
+          } else {
+            break;
+          }
+          m = Math.floor((Left+Right)/2);
+        }
 
-            mem.splice( i, 1 );
-
-            break; } }
+        if(mem[m] !== undefined && mem[m].id == id){
+            mem.splice( m, 1 );
+        }
 
     };
 
@@ -164,7 +193,6 @@ db.sread = function ( id ) {
     };
 
 db.swrite = function ( id, obj, callback ) {
-
     db.write( db.smem, id, obj );
 
     fs.writeFile( './db.json', JSON.stringify( db.smem ), 'utf8', function ( err ) {

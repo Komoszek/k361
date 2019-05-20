@@ -23,7 +23,7 @@ router.get( '/', function( req, res ) {
 
     if ( !Catalog.valid ) {
 
-        res.status(5000).send('Library catalog is inaccessible!');
+        res.status(500).send('Library catalog is inaccessible!');
 return; }
 
     res.json( { catalog: Catalog.obj.catalog, timestamp: Catalog.obj.timestamp } );
@@ -40,7 +40,7 @@ router.get( '/tracks', function( req, res ) {
 
     if ( !Catalog.valid ) {
 
-        res.status(5001).send('Library catalog is inaccessible!');
+        res.status(500).send('Library catalog is inaccessible!');
 return; }
 
     var Tracks = [];
@@ -83,7 +83,7 @@ router.post( '/track', function( req, res ) { // { id: STRING, title: STRING, al
 
     if ( !Catalog.valid ) {
 
-        res.status(5003).send('Library catalog is inaccessible!');
+        res.status(500).send('Library catalog is inaccessible!');
 return; }
 
     var Track = db.sread( 'LIB-TRACK-' + req.body.id );
@@ -211,7 +211,7 @@ router.post( '/download', function( req, res ) { // { service: STRING, code: STR
 
         if ( !Catalog.valid ) {
 
-            res.status(5004).send('Library catalog is inaccessible!');
+            res.status(500).send('Library catalog is inaccessible!');
 return; }
 
         var Track = {
@@ -437,7 +437,7 @@ return; }
 
               if ( !Catalog.valid ) {
 
-                  res.status(5005).send('Library catalog is inaccessible!'); return; }
+                  res.status(500).send('Library catalog is inaccessible!'); return; }
 
               var Track = {
 
@@ -671,7 +671,7 @@ router.post( '/remove', function( req, res ) { // { id: STRING }
 
     if ( !Catalog.valid ) {
 
-        res.status(5006).send('Library catalog is inaccessible!');
+        res.status(500).send('Library catalog is inaccessible!');
 return; }
 
     var Track = db.sread( 'LIB-TRACK-' + req.body.id );
@@ -714,7 +714,7 @@ router.post( '/restore', function( req, res ) { // { id: STRING }
 
     if ( !Catalog.valid ) {
 
-        res.status(5007).send('Library catalog is inaccessible!');
+        res.status(500).send('Library catalog is inaccessible!');
 return; }
 
     var Track = db.sread( 'LIB-TRACK-' + req.body.id );
@@ -772,7 +772,7 @@ router.get( '/clean', function( req, res ) {
 
     if ( !Catalog.valid ) {
 
-        res.status(5008).send('Library catalog is inaccessible!');
+        res.status(500).send('Library catalog is inaccessible!');
 return; }
 
     console.log('Cleaning library');

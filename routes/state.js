@@ -74,6 +74,10 @@ router.post( '/', function( req, res ) { // { settings: OBJECT }
 
         Settings.obj.settings.synchronization_delay = 5000; }
 
+        if ( typeof( req.body.settings.amplifier_toggle ) == 'string' ) {
+
+            Settings.obj.settings.amplifier_toggle = req.body.settings.amplifier_toggle; }
+
     Settings.obj.timestamp = Date.now();
 
     db.swrite( 'STE-SETTINGS', Settings.obj );
@@ -87,7 +91,6 @@ router.post( '/', function( req, res ) { // { settings: OBJECT }
             req.app.locals.PlaylistManager( req.app, db, player ); } }
 
     res.sendStatus(200);
-
     } );
 
 router.post( '/synchronize', function( req, res ) { // { catalog: DATE, schedule: DATE, settings: DATE }
@@ -241,7 +244,6 @@ router.get( '/shutdown', function( req, res ) {
     if ( Audio.valid ) {
 
         if ( Audio.obj.playing ) {
-console.log("ggg");
             Audio.obj.stream.kill();
           } }
 
@@ -265,7 +267,6 @@ router.get( '/reset', function( req, res ) {
     if ( Audio.valid ) {
 
         if ( Audio.obj.playing ) {
-          console.log("lll");
 
             Audio.obj.stream.kill(); } }
 
