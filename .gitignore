@@ -1,0 +1,19 @@
+package-lock.json
+
+# Module specific files
+log
+db.json
+tracks/*
+!tracks/.empty
+node_modules/
+
+# IDE specific files
+.idea/
+*.log
+
+# Platform specific files
+ffmpeg.exe
+mplayer.exe
+mplayer/
+!external/ffmpeg.exe
+!external/mplayer.exe

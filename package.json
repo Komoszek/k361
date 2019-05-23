@@ -1,0 +1,32 @@
+{
+  "name": "k361",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./app.js"
+  },
+  "dependencies": {
+    "angular-inview": "^3.1.0",
+    "body-parser": "^1.18.3",
+    "busboy-body-parser": "^0.3.2",
+    "compression": "^1.7.3",
+    "connect-multiparty": "^2.2.0",
+    "cookie-parser": "~1.4.3",
+    "debug": "^2.6.9",
+    "express": "^4.16.3",
+    "express-minify": "^1.0.0",
+    "minify": "^3.0.5",
+    "ng-repeat-fast": "^0.2.21",
+    "nz-toggle": "^2.1.0",
+    "play-sound": "^1.1.2",
+    "serialport": "^7.0.2",
+    "serve-favicon": "^2.5.0",
+    "shortid": "^2.2.13",
+    "sox": "^0.1.0",
+    "youtube-info": "^1.2.1",
+    "youtube-mp3-downloader": "^0.5.3"
+  },
+  "devDependencies": {
+    "purgecss": "^1.1.0"
+  }
+}

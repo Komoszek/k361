@@ -1,0 +1,117 @@
+--------------------------------------------------
+
+ATH-PASSWORD: {
+
+    password: STRING,
+    timestamp DATE
+
+    }
+
+--------------------------------------------------
+
+LIB-CATALOG: {
+
+    catalog: [ // ALL TRACKS WITH 'READY' STATE
+
+        {
+            id: STRING, // TRACK ID
+            timestamp: DATE, // TIMESTAMP
+
+            title: STRING,
+            album: STRING,
+            author: STRING,
+            length: NUMBER
+        }
+
+        // ...
+
+        ],
+
+    tracks: [ STRING ], // IDS OF ALL TRACKS
+
+    timestamp: DATE
+
+    }
+
+--------------------------------------------------
+
+LIB-TRACK-XXX: {
+
+    id: STRING,
+
+    title: STRING,
+    album: STRING,
+    author: STRING,
+
+    length: NUMBER,
+    begin: NUMBER,
+    end: NUMBER,
+
+    volume: NUMBER, // FROM 0 TO 100
+    rate: NUMBER, // FROM 0 TO 10
+    views: NUMBER,
+
+    path: PATH,
+    state: STRING // 'UPLOAD' OR 'DOWNLOAD' OR 'ERROR' OR 'READY' OR 'REMOVED'
+
+    }
+
+--------------------------------------------------
+
+PLT-SCHEDULE: {
+
+    schedule: [
+
+        {
+            id: STRING, // ENTRY ID
+            track: STRING, // TRACK ID
+
+            begin: DATE,
+            end: DATE
+        }
+
+        // ...
+
+        ]
+
+    timestamp: DATE
+
+    }
+
+--------------------------------------------------
+
+STE-SETTINGS: {
+
+    settings: {
+
+        playlist_designer: BOOLEAN,
+        playlist_designer_launch_time: NUMBER, // FROM 0 TO 86399
+        synchronization_delay: NUMBER, // FROM 100 TO 5000
+
+        playlist_designer_time_intervals: [
+
+            days: [ BOOLEAN ], // 7 ELEMENTS
+            begin: NUMBER, // FROM 0 TO 86399
+            end: NUMBER, // FROM 0 TO 86399
+
+            text: STRING
+
+            ],
+
+        reserved_time_intervals: [
+
+            days: [ BOOLEAN ], // 7 ELEMENTS
+            begin: NUMBER, // FROM 0 TO 86399
+            end: NUMBER, // FROM 0 TO 86399
+
+            text: STRING
+
+            ]
+
+        }
+
+    timestamp: DATE
+
+    }
+
+--------------------------------------------------

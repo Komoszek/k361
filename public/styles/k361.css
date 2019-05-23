@@ -1,0 +1,315 @@
+@font-face {
+
+    font-family: "Roboto";
+    font-weight: 200;
+
+    src: local( Roboto Thin ), url( "../fonts/roboto/Roboto-Thin.eot" );
+    src: url( "../fonts/roboto/Roboto-Thin.eot?#iefix" ) format( "embedded-opentype" ), url( "../fonts/roboto/Roboto-Thin.woff2" ) format( "woff2" ), url( "../fonts/roboto/Roboto-Thin.woff" ) format( "woff" ), url( "../fonts/roboto/Roboto-Thin.ttf" ) format( "truetype" ); }
+
+@font-face {
+
+    font-family: "Roboto";
+    font-weight: 300;
+
+    src: local( Roboto Light ), url( "../fonts/roboto/Roboto-Light.eot" );
+    src: url( "../fonts/roboto/Roboto-Light.eot?#iefix" ) format( "embedded-opentype" ), url( "../fonts/roboto/Roboto-Light.woff2" ) format( "woff2" ), url( "../fonts/roboto/Roboto-Light.woff" ) format( "woff" ), url( "../fonts/roboto/Roboto-Light.ttf" ) format( "truetype" ); }
+
+@font-face {
+
+    font-family: "Roboto";
+    font-weight: 400;
+
+    src: local( Roboto Regular ), url( "../fonts/roboto/Roboto-Regular.eot" );
+    src: url( "../fonts/roboto/Roboto-Regular.eot?#iefix" ) format( "embedded-opentype" ), url( "../fonts/roboto/Roboto-Regular.woff2" ) format( "woff2" ), url( "../fonts/roboto/Roboto-Regular.woff" ) format( "woff" ), url( "../fonts/roboto/Roboto-Regular.ttf" ) format( "truetype" ); }
+
+@font-face {
+
+    font-family: "Roboto";
+    font-weight: 500;
+
+    src: url( "../fonts/roboto/Roboto-Medium.eot" );
+    src: url( "../fonts/roboto/Roboto-Medium.eot?#iefix" ) format( "embedded-opentype" ), url( "../fonts/roboto/Roboto-Medium.woff2" ) format( "woff2" ), url( "../fonts/roboto/Roboto-Medium.woff" ) format( "woff" ), url( "../fonts/roboto/Roboto-Medium.ttf" ) format( "truetype" ); }
+
+@font-face {
+
+    font-family: "Roboto";
+    font-weight: 700;
+
+    src: url("../fonts/roboto/Roboto-Bold.eot");
+    src: url( "../fonts/roboto/Roboto-Bold.eot?#iefix" ) format( "embedded-opentype" ), url( "../fonts/roboto/Roboto-Bold.woff2" ) format( "woff2" ), url( "../fonts/roboto/Roboto-Bold.woff" ) format( "woff" ), url( "../fonts/roboto/Roboto-Bold.ttf" ) format( "truetype" ); }
+
+html {
+
+    color: rgba( 0, 0, 0, 0.87 );
+    line-height: 1.5;
+
+    font-family: "Roboto", sans-serif;
+    font-weight: normal;
+
+    }
+
+.fab-top {
+
+    transform: scale(0);
+    transition: transform 0.3s ease-in;
+
+    }
+
+.fab-top.visible {
+
+    transform: scale(1);
+    transition: transform 0.3s ease-in;
+
+    }
+
+    #ContentContainer {
+      height:100%;
+    will-change: transform;
+    }
+
+#Playlist .controls {
+
+    margin: 20px;
+
+    border-radius: 2px;
+    background-color: #FFFFFF;
+
+    }
+
+
+    #Playlist .timeline {
+
+        margin: 0 20px 20px 20px;
+        padding-top:0px;padding-bottom:0px;
+        border-radius: 2px;
+        background-color: #FFFFFF;
+
+        }
+
+#Playlist .timeline md-list {
+
+    padding: 0;
+
+    }
+
+#Playlist .timeline md-list-item {
+
+    border-bottom:solid 1px rgba(0,0,0,0.12)
+
+    }
+
+#Playlist .timeline .md-list-item-text h3 {
+
+    margin: 4px 0 3px;
+
+    }
+
+#Library .search {
+
+    height: 40px;
+    margin: 20px;
+
+    border-radius: 2px;
+
+    }
+
+#Library .search input {
+
+    width: 100%;
+    height: 100%;
+
+    padding: 8px;
+    font-size: 16px;
+
+    border: none;
+    outline: none;
+    border-radius: 2px;
+
+    box-sizing: border-box;
+
+    }
+
+#Library .list {
+
+    margin: 0 20px 20px 20px;
+    padding-top:0px;padding-bottom:0px;
+    border-radius: 2px;
+    background-color: white;
+    will-change: contents;
+
+   -webkit-transition: none !important;
+   transition: none !important;
+
+
+    }
+
+#Library .list md-list {
+
+    padding: 0;
+
+    }
+
+#Library .list .md-list-item-text h3 {
+
+    margin: 4px 0 3px;
+
+    }
+
+
+#Library .list .md-list-item-text p {
+
+    font-size:12px;
+
+    }
+
+#Library .list md-list-item {
+
+    border-bottom:solid 1px rgba(0,0,0,0.12);
+
+
+    }
+
+#Settings .frame {
+
+    margin: 20px;
+    padding: 10px;
+
+    box-sizing: border-box;
+
+    border-radius: 2px;
+    background-color: #FFFFFF;
+
+    }
+
+#Settings .frame h2 {
+
+    margin-top: 15px;
+    margin-bottom: 10px;
+
+    font-size: 20px;
+
+    }
+
+#Settings .frame ul {
+
+    margin: 10px 0 0 0;
+    padding-left: 20px;
+
+    }
+
+#Settings .frame md-input-container .md-errors-spacer {
+
+    min-height: 0;
+
+    }
+
+.hide-tab-bar md-tabs-wrapper {
+
+    display: none;
+
+    }
+
+    tags-input .tags{
+
+    }
+    .bootstrap .tags {
+      background: transparent;
+      border-left-width:0px;
+      border-right-width:0px;
+      border-top-width:0px;
+      border-bottom: 1px solid rgba(0,0,0,0.12);
+      box-shadow: 0px 0px 0px black;
+
+  transition: border-color ease-in-out .15s;
+}
+
+.bootstrap .tags.focused {
+  border-left-width:0px;
+  border-right-width:0px;
+  border-top-width:0px;
+  box-shadow: 0px 0px 0px black;
+  margin-bottom: -1px;
+
+  border-bottom: 2px solid rgb(63,81,181);
+    }
+
+.bootstrap .tags .tag-item {
+  background: rgb(63,81,181);
+  border: 1px solid #357ebd;
+  border-radius: 4px;
+  color: #fff;
+}
+
+.bootstrap .tags .tag-item.selected {
+  background: rgb(53,73,171);
+  border: 1px solid #d43f3a;
+  border-radius: 4px;
+  color: #fff;
+}
+
+.bootstrap .tags .tag-item button {
+  background: transparent;
+  color: #000;
+  opacity: .4;
+}
+
+.bootstrap .host{
+  margin-top:0px;
+  margin-bottom:0px;
+}
+
+.bootstrap .autocomplete {
+  border-radius: 4px;
+}
+
+.bootstrap .autocomplete .suggestion-item.selected {
+  color: #262626;
+  background-color: #e9e9e9;
+}
+
+.bootstrap .autocomplete .suggestion-item em {
+  font-weight: normal;
+  background-color: #ffff00;
+}
+
+.bootstrap .autocomplete .suggestion-item.selected em {
+  color: #262626;
+  background-color: #100ffff00;
+}
+
+.bootstrap .input {
+  background-color: transparent;
+  margin: 0px!important;
+  font:100% "Roboto", sans-serif!important;
+}
+
+
+.bootstrap .remove-button {
+  color: #fff!important;
+}
+
+.playlist-search{
+  margin:0px;
+  width: calc(100% - 32px);
+  padding: 0px 16px;
+  text-align:center;
+}
+
+.playlist-search > input {
+
+  margin-top:2%;
+}
+
+.drop-box {
+  text-align: center;
+  border: 3px dashed #357ebd;
+  height:92px;
+  font-size:18px;
+  line-height: 92px;
+}
+
+.drop-box:hover {
+  cursor: pointer;
+}
+
+.

@@ -1,0 +1,126 @@
+<md-dialog style="width:100%;max-width:700px;" aria-label="Edytowanie przedziałów czasowych"> <!-- EN: intervals edition -->
+
+    <form name="DialogForm" ng-cloak>
+
+        <md-toolbar>
+
+            <div class="md-toolbar-tools">
+
+                <h2>Edytowanie przedziałów czasowych</h2> <!-- EN: Time intervals edition -->
+
+                <span flex></span>
+
+                <md-button class="md-icon-button" ng-click="cancel()">
+                    <md-icon md-svg-src="images/close.svg" aria-label="Zamknij okno edytowania przedziałów czasowych"></md-icon> <!-- EN: Close the window of time intervals edition -->
+                </md-button>
+
+            </div>
+
+        </md-toolbar>
+
+        <md-dialog-content>
+
+            <md-content class="md-padding" layout="column" flex>
+
+                <div style="margin-bottom:20px;" layout="row" flex>
+
+                    <span flex></span>
+
+                    <md-select ng-model="Selected" ng-change="SelectTimeInterval()" aria-label="Przedział czasowy" flex="70"> <!-- EN: Time interval -->
+                        <md-option ng-value="$index" ng-repeat="interval in Intervals track by $index">{{interval.text}}</md-option>
+                        <md-option ng-value="Intervals.length">Nowy przedział czasowy</md-option> <!-- EN: New time interval -->
+                    </md-select>
+
+                    <span flex></span>
+
+                </div>
+
+                <div layout="row" layout-align="center center" flex>
+
+                    <md-checkbox class="md-primary" ng-model="Days[1]" aria-label="Poniedziałek"> <!-- EN: Monday -->
+                        {{ $mdMedia('gt-xs') && 'Poniedziałek' || 'Pon' }} <!-- EN: Monday | Mon -->
+                    </md-checkbox>
+
+                    <md-checkbox class="md-primary" ng-model="Days[2]" aria-label="Wtorek"> <!-- EN: Tuesday -->
+                        {{ $mdMedia('gt-xs') && 'Wtorek' || 'Wt' }} <!-- EN: Tuesday | Tue -->
+                    </md-checkbox>
+
+                    <md-checkbox class="md-primary" ng-model="Days[3]" aria-label="Środa"> <!-- EN: Wednesday -->
+                        {{ $mdMedia('gt-xs') && 'Środa' || 'Śr' }} <!-- EN: Wednesday | Wed -->
+                    </md-checkbox>
+
+                </div>
+
+                <div layout="row" layout-align="center center" flex>
+
+                    <md-checkbox class="md-primary" ng-model="Days[4]" aria-label="Czwartek"> <!-- EN: Thursday -->
+                        {{ $mdMedia('gt-xs') && 'Czwartek' || 'Czw' }} <!-- EN: Thursday | Thu -->
+                    </md-checkbox>
+
+                    <md-checkbox class="md-primary" ng-model="Days[5]" aria-label="Piątek"> <!-- EN: Friday -->
+                        {{ $mdMedia('gt-xs') && 'Piątek' || 'Pt' }} <!-- EN: Friday | Fri -->
+                    </md-checkbox>
+
+                    <md-checkbox class="md-primary" ng-model="Days[6]" aria-label="Sobota"> <!-- EN: Saturday -->
+                        {{ $mdMedia('gt-xs') && 'Sobota' || 'Sob' }} <!-- EN: Saturday | Sat -->
+                    </md-checkbox>
+
+                    <md-checkbox class="md-primary" ng-model="Days[0]" aria-label="Niedziela"> <!-- EN: Sunday -->
+                        {{ $mdMedia('gt-xs') && 'Niedziela' || 'Nd' }} <!-- EN: Sunday | Sun -->
+                    </md-checkbox>
+
+                </div>
+
+                <div layout="row" layout-align="center center" flex>
+
+                    <span flex></span>
+
+                    <md-input-container style="margin-top:17px;margin-bottom:0;" flex="30">
+                        <input style="text-align:center;" name="Begin" aria-label="Początek" ng-model="Begin" ng-pattern="/^(([0-1]?[0-9])|(2[0-3])):([0-5][0-9]):([0-5][0-9])$/" required> <!-- EN: Begin -->
+                        <md-tooltip md-direction="top">Czas w formacie HH:MM:SS</md-tooltip> <!-- EN: Time in format HH:MM:SS -->
+                    </md-input-container>
+
+                    <span style="text-align:center;" flex="5">-</span>
+
+                    <md-input-container style="margin-top:17px;margin-bottom:0;" flex="30">
+                        <input style="text-align:center;" name="End" aria-label="Koniec" ng-model="End" ng-pattern="/^(([0-1]?[0-9])|(2[0-3])):([0-5][0-9]):([0-5][0-9])$/" required> <!-- EN: End -->
+                        <md-tooltip md-direction="top">Czas w formacie HH:MM:SS</md-tooltip> <!-- EN: Time in format HH:MM:SS -->
+                    </md-input-container>
+
+                    <span flex></span>
+
+                </div>
+
+                <div ng-show="Selected!=Intervals.length" layout="row" layout-align="center center" flex>
+
+                    <span flex></span>
+
+                    <md-input-container style="margin-top:10px;margin-bottom:15px;" layout="row">
+                        <span flex></span>
+                        <md-button ng-style="{ 'min-width' : ( $mdMedia('gt-xs') && '210px' || '135px' ) }" class="md-raised md-primary" ng-disabled="!Validate()" ng-click="UpdateTimeInterval();hide();">&nbsp;&nbsp;&nbsp;{{ $mdMedia('gt-xs') && 'Zauktualizuj przedział' || 'Zauktualizuj' }}&nbsp;&nbsp;&nbsp;</md-button> <!-- EN: Update interval | Update -->
+                        <span flex></span>
+                    </md-input-container>
+
+                    <md-input-container style="margin-top:10px;margin-bottom:15px;" layout="row">
+                        <span flex></span>
+                        <md-button ng-style="{ 'min-width' : ( $mdMedia('gt-xs') && '210px' || '135px' ) }" class="md-raised md-primary" ng-click="DeleteTimeInterval();hide();">&nbsp;&nbsp;&nbsp;{{ $mdMedia('gt-xs') && 'Usuń przedział' || 'Usuń' }}&nbsp;&nbsp;&nbsp;</md-button> <!-- EN: Delete interval | Delete -->
+                        <span flex></span>
+                    </md-input-container>
+
+                    <span flex></span>
+
+                </div>
+
+                <md-input-container style="margin-top:10px;margin-bottom:15px;" ng-show="Selected==Intervals.length" layout="row" flex>
+                    <span flex></span>
+                    <md-button class="md-raised md-primary" ng-disabled="!Validate()" ng-click="CreateTimeInterval();hide();">&nbsp;&nbsp;&nbsp;Dodaj przedział czasowy&nbsp;&nbsp;&nbsp;</md-button> <!-- EN: Add time interval -->
+                    <span flex></span>
+                </md-input-container>
+
+            </md-content>
+
+        </md-dialog-content>
+
+    </form>
+
+</md-dialog>
