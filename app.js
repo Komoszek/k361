@@ -746,10 +746,10 @@ app.locals.PlaylistDesigner = function ( app, db, player ) {
       var NowRemover = new Date();
 
       var Catalog = db.sread('LIB-CATALOG');
+
       if ( !Catalog.valid ) {
 
           return; }
-
       for(var k = Catalog.obj.catalog.length-1;k>=0;k--){
 
         var TimeoutTrack = db.sread( 'LIB-TRACK-' + Catalog.obj.catalog[k].id );
