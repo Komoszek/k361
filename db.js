@@ -111,6 +111,8 @@ db.write = function ( mem, id, obj, json_friendly ) {
         var m = Math.floor((Left+Right)/2)
 
         while(Left < Right){
+          if( mem[m].id > id && mem[m-1].id < id)
+            break;
           if(mem[m].id > id){
             Right = m-1;
           } else if(mem[m].id < id){
@@ -120,6 +122,9 @@ db.write = function ( mem, id, obj, json_friendly ) {
           }
           m = Math.floor((Left+Right)/2);
         }
+        if(m < 0)
+          m = 0;
+
 
         if(mem[m] !== undefined && mem[m].id == id){
           if ( typeof( json_friendly ) != 'boolean' ) {

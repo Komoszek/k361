@@ -597,14 +597,14 @@ app.locals.PlaylistDesigner = function ( app, db, player ) {
         if(m > 0)
           console.log( Schedule.obj.schedule[m-1].end,'b' );*/
 }
-/*
-        for ( var i = Schedule.obj.schedule.length - 1; i >= 0 && TestTracks.length < 10; i-- ) { // TODO: CHANGE LINEAR SEARCH TO BINARY SEARCH
+
+  /*      for ( var i = Schedule.obj.schedule.length - 1; i >= 0 && LatestTracks.length < 10; i-- ) { // TODO: CHANGE LINEAR SEARCH TO BINARY SEARCH
 
             if ( Schedule.obj.schedule[i].end > Intervals[0].begin ) {
 
                 continue; }
 
-            TestTracks.unshift( Schedule.obj.schedule[i].track );
+            LatestTracks.unshift( Schedule.obj.schedule[i].track );
 
           }
 */
@@ -687,15 +687,15 @@ app.locals.PlaylistDesigner = function ( app, db, player ) {
 
             Begin = Midnight.getTime() + Begin * 1000;
             End = Midnight.getTime() + End * 1000;
-/*
-            var Kurwix = 0;
 
-            while ( Kurwix < Schedule.obj.schedule.length ) { // TODO: CHANGE LINEAR SEARCH TO BINARY SEARCH
+        /*    var Index = 0;
+
+            while ( Index < Schedule.obj.schedule.length ) { // TODO: CHANGE LINEAR SEARCH TO BINARY SEARCH
               //Index is index of last element of the schedule that begin before the End
 
-                if ( End > Schedule.obj.schedule[Kurwix].begin ) {
+                if ( End > Schedule.obj.schedule[Index].begin ) {
 
-                    Kurwix++; }
+                    Index++; }
 
                 else {
 
@@ -717,7 +717,7 @@ app.locals.PlaylistDesigner = function ( app, db, player ) {
                break;
              }
              Index = Math.floor((Left + Right)/2);
-            }
+           }
 
             var Entry = {
 
