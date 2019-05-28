@@ -35,7 +35,8 @@ router.post( '/play', function( req, res ) {
 
         res.status(401).send('Unauthorized'); return; }
 
-    if ( req.app.locals.GetAudioAccessPermission( db ) ) {
+    var Settings = db.sread('STE-SETTINGS');    
+    if ( req.app.locals.GetAudioAccessPermission( db ) && Settings.obj.settings.amplifier_toggle !== 'on') { 
 
         res.status(409).send('Track must not be played during reserved time intervals.'); return; }
 
