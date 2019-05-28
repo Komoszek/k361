@@ -147,12 +147,14 @@ app.locals.AudioAccessWatchman = function ( app, db ) {
     app.locals.AudioAccessWatchmanTimeout = setTimeout( function ( ) { app.locals.AudioAccessWatchman( app, db ); }, 1000 );
 
     var Audio = db.dread( 'PLT-AUDIO' );
+    
+    var Settings = db.sread('STE-SETTINGS');   
 
     if ( !Audio.valid ) {
 
         return; }
 
-    if ( Audio.obj.playing ) {
+    if (Audio.obj.playing && Settings.obj.settings.amplifier_toggle !== 'on') { //TODO turn off music on amp 'off'
         if ( app.locals.GetAudioAccessPermission( db ) ) {
 
             Audio.obj.stream.kill();
