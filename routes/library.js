@@ -245,17 +245,16 @@ return; }
             var File = new youtube( {
 
                 'ffmpegPath': config.ffmpeg_path,
-                'outputPath': 'tracks',
+                'outputPath': './tracks',
                 'youtubeVideoQuality': 'highest',
                 'queueParallelism': 10,
                 'progressTimeout': 5000
 
                 } );
-
+                
             File.download( req.body.code, Track.id + '.mp3' );
 
             File.on( 'finished', function( data ) {
-
                 var Catalog = db.sread('LIB-CATALOG');
 
                 if ( !Catalog.valid ) {
